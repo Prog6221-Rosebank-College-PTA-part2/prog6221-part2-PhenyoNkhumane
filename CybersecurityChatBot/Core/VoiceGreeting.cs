@@ -1,12 +1,10 @@
-using System;
 using System.IO;
 using System.Media;
-
-class VoiceGreeting
+public static class VoiceGreeting
 {
     public static void PlayVoiceGreeting()
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "Greeting.wav");
+        string path = Path.Combine(System.AppContext.BaseDirectory, "Greeting.wav");
         try
         {
             using (SoundPlayer player = new SoundPlayer(path))
@@ -16,7 +14,7 @@ class VoiceGreeting
         }
         catch
         {
-            Console.WriteLine("Audio could not be played.");
+            // Silently continue — missing audio must never crash the UI
         }
     }
 }
