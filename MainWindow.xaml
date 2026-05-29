@@ -175,6 +175,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- User text input -->
@@ -194,7 +195,18 @@
                         Style="{StaticResource SendButtonStyle}"
                         Height="40"
                         IsEnabled="False"
+                        Margin="0,0,10,0"
                         Click="SendButton_Click"/>
+
+                <!-- Clear chat button -->
+                <Button Grid.Column="2"
+                        x:Name="ClearButton"
+                        Content="Clear"
+                        Style="{StaticResource SendButtonStyle}"
+                        Height="40"
+                        Background="#37474f"
+                        Foreground="#e0e0e0"
+                        Click="ClearButton_Click"/>
             </Grid>
         </Border>
 

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("prog6221-part2-PhenyoNkhumane")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f50efc1bde629f05da3f182c8c089a1b11db25e0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c16de7e48788edd62cd596895a3d253b6a24eed")]
 [assembly: System.Reflection.AssemblyProductAttribute("prog6221-part2-PhenyoNkhumane")]
 [assembly: System.Reflection.AssemblyTitleAttribute("prog6221-part2-PhenyoNkhumane")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

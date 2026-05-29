@@ -1,0 +1,11 @@
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\MainWindow.baml
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\MainWindow.g.cs
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\App.g.cs
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane_Content.g.cs
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane_MarkupCompile.cache
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.g.resources
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.AssemblyInfoInputs.cache
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.AssemblyInfo.cs
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.csproj.CoreCompileInputs.cache
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.sourcelink.json

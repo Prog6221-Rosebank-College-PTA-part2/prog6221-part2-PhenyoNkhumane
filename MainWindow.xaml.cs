@@ -9,27 +9,19 @@ public partial class MainWindow : Window
 {
     private readonly ChatBot _chatBot = new ChatBot();
 
-    // Colour brushes — defined once and reused for every message bubble
-    private static readonly SolidColorBrush BrushBotText     = new SolidColorBrush(Color.FromRgb(0x00, 0xe6, 0x76));  // green
-    private static readonly SolidColorBrush BrushUserText    = new SolidColorBrush(Color.FromRgb(0xff, 0xd6, 0x00));  // yellow
-    private static readonly SolidColorBrush BrushWarningText = new SolidColorBrush(Color.FromRgb(0xff, 0xab, 0x00));  // amber
-    private static readonly SolidColorBrush BrushMuted       = new SolidColorBrush(Color.FromRgb(0x60, 0x7d, 0x8b));  // grey
-    private static readonly SolidColorBrush BrushBotBubble   = new SolidColorBrush(Color.FromRgb(0x12, 0x12, 0x2a));  // dark panel
-    private static readonly SolidColorBrush BrushUserBubble  = new SolidColorBrush(Color.FromRgb(0x1a, 0x2a, 0x1a));  // dark green tint
-
+    private static readonly SolidColorBrush BrushBotText     = new SolidColorBrush(Color.FromRgb(0x00, 0xe6, 0x76));
+    private static readonly SolidColorBrush BrushUserText    = new SolidColorBrush(Color.FromRgb(0xff, 0xd6, 0x00));
+    private static readonly SolidColorBrush BrushWarningText = new SolidColorBrush(Color.FromRgb(0xff, 0xab, 0x00));
+    private static readonly SolidColorBrush BrushMuted       = new SolidColorBrush(Color.FromRgb(0x60, 0x7d, 0x8b));
+    private static readonly SolidColorBrush BrushBotBubble   = new SolidColorBrush(Color.FromRgb(0x12, 0x12, 0x2a));
+    private static readonly SolidColorBrush BrushUserBubble  = new SolidColorBrush(Color.FromRgb(0x1a, 0x2a, 0x1a));
 
     public MainWindow()
     {
         InitializeComponent();
 
-        // Play WAV greeting before the window is interactive
-        // PlaySync blocks briefly — acceptable for a short clip
         VoiceGreeting.PlayVoiceGreeting();
-
-        // Populate the ASCII banner in the header
         BannerTextBlock.Text = AsciiArt.GetBannerText();
-
-        // Focus the name input immediately so the user can type right away
         NameInputBox.Focus();
     }
 
@@ -50,31 +42,22 @@ public partial class MainWindow : Window
 
         if (error != null)
         {
-            // Show validation error inside the overlay card
             NameErrorLabel.Text       = error;
             NameErrorLabel.Visibility = Visibility.Visible;
             NameInputBox.Focus();
             return;
         }
 
-        // Name accepted — hide the overlay with a quick fade
         FadeOut(NamePromptOverlay, onComplete: () =>
         {
             NamePromptOverlay.Visibility = Visibility.Collapsed;
-
-            // Show the ASCII welcome message in the chat area
             AppendBotMessage(_chatBot.GetWelcomeMessage(), isWelcome: true);
-
-            // Update window title with the user's name
             Title = $"🔐 Mavicks — {_chatBot.GetUserName()}";
-
-            // Ready for input
             UserInputBox.IsEnabled = true;
             SendButton.IsEnabled   = true;
             UserInputBox.Focus();
         });
     }
-
 
     private void UserInputBox_KeyDown(object sender, KeyEventArgs e)
     {
@@ -87,28 +70,28 @@ public partial class MainWindow : Window
         Send();
     }
 
+    private void ClearButton_Click(object sender, RoutedEventArgs e)
+    {
+        ChatPanel.Children.Clear();
+        AppendSystemMessage("Chat history cleared.");
+    }
+
     private void Send()
     {
         string userText = UserInputBox.Text.Trim();
 
-        // Silently ignore empty sends (button press with no text)
         if (string.IsNullOrWhiteSpace(userText))
         {
             UserInputBox.Focus();
             return;
         }
 
-        // Show what the user typed
         AppendUserMessage(userText);
         UserInputBox.Clear();
 
-        // Get the bot's response
         ChatBotResponse result = _chatBot.ProcessMessage(userText);
-
-        // Append response with appropriate styling
         AppendBotMessage(result.Message, isWarning: result.IsWarning);
 
-        // If the user said goodbye, disable input
         if (result.IsExit)
         {
             UserInputBox.IsEnabled = false;
@@ -146,7 +129,6 @@ public partial class MainWindow : Window
 
         if (isWelcome)
         {
-            // Welcome message uses Consolas so the box-drawing chars align
             bubble = BuildMonoBubble(label, text, BrushBotText, BrushBotBubble);
         }
         else
@@ -218,9 +200,9 @@ public partial class MainWindow : Window
             CornerRadius        = new CornerRadius(8),
             Padding             = new Thickness(14, 10, 14, 10),
             Margin              = new Thickness(
-                alignRight ? 80 : 0,   // left margin
+                alignRight ? 80 : 0,
                 4,
-                alignRight ? 0 : 80,   // right margin
+                alignRight ? 0 : 80,
                 4),
             HorizontalAlignment = alignRight
                 ? HorizontalAlignment.Right
@@ -272,7 +254,6 @@ public partial class MainWindow : Window
 
     private void ScrollToBottom()
     {
-        // Defer until after layout so the new element has been measured
         Dispatcher.InvokeAsync(() =>
         {
             ChatScrollViewer.ScrollToEnd();

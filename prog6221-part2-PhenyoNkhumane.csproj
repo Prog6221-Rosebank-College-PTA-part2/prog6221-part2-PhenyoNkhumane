@@ -5,8 +5,10 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Prog6221_Part2_PhenyoNkhumane</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Program.cs" />
+    <Content Include="CybersecurityChatBot\Greeting.wav" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

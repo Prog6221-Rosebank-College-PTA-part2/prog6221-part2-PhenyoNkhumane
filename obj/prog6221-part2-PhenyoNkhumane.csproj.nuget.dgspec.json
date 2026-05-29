@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\pheny\\Music\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj": {}
+    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj": {}
   },
   "projects": {
-    "c:\\Users\\pheny\\Music\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj": {
+    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\pheny\\Music\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj",
+        "projectUniqueName": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj",
         "projectName": "prog6221-part2-PhenyoNkhumane",
-        "projectPath": "c:\\Users\\pheny\\Music\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj",
+        "projectPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj",
         "packagesPath": "C:\\Users\\pheny\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\pheny\\Music\\prog6221-part2-PhenyoNkhumane\\obj\\",
+        "outputPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
