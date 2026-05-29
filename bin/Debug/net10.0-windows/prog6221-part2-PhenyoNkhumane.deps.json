@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "prog6221-part2-PhenyoNkhumane/1.0.0": {
+        "runtime": {
+          "prog6221-part2-PhenyoNkhumane.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "prog6221-part2-PhenyoNkhumane/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
