@@ -1,0 +1,271 @@
+<Window x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🔐 Mavicks — Cybersecurity Awareness Assistant"
+        Height="750" Width="900"
+        MinHeight="600" MinWidth="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#0d0d1a">
+
+    <Window.Resources>
+
+        <!-- ═══════════════════════════════════════════════
+             COLOUR PALETTE  (mirrors the console theme)
+        ════════════════════════════════════════════════ -->
+        <SolidColorBrush x:Key="BgDeep"        Color="#0d0d1a"/>
+        <SolidColorBrush x:Key="BgPanel"       Color="#12122a"/>
+        <SolidColorBrush x:Key="BgInput"       Color="#1a1a35"/>
+        <SolidColorBrush x:Key="AccentCyan"    Color="#00e5ff"/>
+        <SolidColorBrush x:Key="AccentGreen"   Color="#00e676"/>
+        <SolidColorBrush x:Key="AccentYellow"  Color="#ffd600"/>
+        <SolidColorBrush x:Key="AccentAmber"   Color="#ffab00"/>
+        <SolidColorBrush x:Key="TextMuted"     Color="#607d8b"/>
+        <SolidColorBrush x:Key="TextWhite"     Color="#e0e0e0"/>
+        <SolidColorBrush x:Key="BorderColour"  Color="#1e3a5f"/>
+
+        <!-- ═══════════════════════════════════════════════
+             SEND BUTTON STYLE
+        ════════════════════════════════════════════════ -->
+        <Style x:Key="SendButtonStyle" TargetType="Button">
+            <Setter Property="Background"   Value="#00e5ff"/>
+            <Setter Property="Foreground"   Value="#0d0d1a"/>
+            <Setter Property="FontFamily"   Value="Consolas"/>
+            <Setter Property="FontSize"     Value="14"/>
+            <Setter Property="FontWeight"   Value="Bold"/>
+            <Setter Property="Padding"      Value="20,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor"       Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#00b8d4"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#006064"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#37474f"/>
+                                <Setter Property="Foreground" Value="#607d8b"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════
+             INPUT TEXTBOX STYLE
+        ════════════════════════════════════════════════ -->
+        <Style x:Key="InputBoxStyle" TargetType="TextBox">
+            <Setter Property="Background"       Value="#1a1a35"/>
+            <Setter Property="Foreground"       Value="#e0e0e0"/>
+            <Setter Property="CaretBrush"       Value="#00e5ff"/>
+            <Setter Property="FontFamily"       Value="Consolas"/>
+            <Setter Property="FontSize"         Value="14"/>
+            <Setter Property="BorderBrush"      Value="#1e3a5f"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="12,8"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#00e5ff"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ROOT LAYOUT — three rows:
+           Row 0 → header  (ASCII banner + title)
+           Row 1 → chat    (scrollable message area)
+           Row 2 → input   (text box + send button)
+    ════════════════════════════════════════════════════════════════ -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- Header       -->
+            <RowDefinition Height="*"/>      <!-- Chat area    -->
+            <RowDefinition Height="Auto"/>   <!-- Input bar    -->
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════════════════════════════
+             ROW 0 — HEADER
+        ════════════════════════════════════ -->
+        <Border Grid.Row="0"
+                Background="#12122a"
+                BorderBrush="#1e3a5f"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ASCII robot + banner text -->
+                <TextBlock Grid.Column="0"
+                           x:Name="BannerTextBlock"
+                           FontFamily="Consolas"
+                           FontSize="11"
+                           Foreground="#00e5ff"
+                           VerticalAlignment="Center"
+                           Margin="0,0,16,0"
+                           TextWrapping="NoWrap"/>
+
+                <!-- Title + subtitle stack -->
+                <StackPanel Grid.Column="1"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="🔐 MAVICKS"
+                               FontFamily="Consolas"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="#00e5ff"/>
+                    <TextBlock Text="Cybersecurity Awareness Assistant"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               Foreground="#607d8b"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════════════════════════════
+             ROW 1 — CHAT AREA
+        ════════════════════════════════════ -->
+        <ScrollViewer Grid.Row="1"
+                      x:Name="ChatScrollViewer"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Background="#0d0d1a"
+                      Padding="16,12">
+            <StackPanel x:Name="ChatPanel"
+                        Orientation="Vertical"/>
+        </ScrollViewer>
+
+        <!-- ═══════════════════════════════════
+             ROW 2 — INPUT BAR
+        ════════════════════════════════════ -->
+        <Border Grid.Row="2"
+                Background="#12122a"
+                BorderBrush="#1e3a5f"
+                BorderThickness="0,1,0,0"
+                Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- User text input -->
+                <TextBox Grid.Column="0"
+                         x:Name="UserInputBox"
+                         Style="{StaticResource InputBoxStyle}"
+                         Height="40"
+                         Margin="0,0,10,0"
+                         IsEnabled="False"
+                         KeyDown="UserInputBox_KeyDown"
+                         ToolTip="Type your message and press Enter or click Send"/>
+
+                <!-- Send button -->
+                <Button Grid.Column="1"
+                        x:Name="SendButton"
+                        Content="Send"
+                        Style="{StaticResource SendButtonStyle}"
+                        Height="40"
+                        IsEnabled="False"
+                        Click="SendButton_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════════════════════════════
+             NAME PROMPT OVERLAY
+             Shown at startup until user submits
+             their name. Hidden afterwards.
+        ════════════════════════════════════ -->
+        <Grid Grid.Row="0"
+              Grid.RowSpan="3"
+              x:Name="NamePromptOverlay"
+              Background="#CC0d0d1a"
+              Visibility="Visible">
+
+            <Border HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="#12122a"
+                    BorderBrush="#00e5ff"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="40,32"
+                    MinWidth="400">
+                <StackPanel>
+                    <!-- Lock icon + heading -->
+                    <TextBlock Text="🔐"
+                               FontSize="48"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Welcome to Mavicks"
+                               FontFamily="Consolas"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#00e5ff"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Cybersecurity Awareness Assistant"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               Foreground="#607d8b"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,24"/>
+
+                    <!-- Name label + input -->
+                    <TextBlock Text="Please enter your name to begin:"
+                               FontFamily="Consolas"
+                               FontSize="13"
+                               Foreground="#e0e0e0"
+                               Margin="0,0,0,8"/>
+                    <TextBox x:Name="NameInputBox"
+                             Style="{StaticResource InputBoxStyle}"
+                             Height="40"
+                             Margin="0,0,0,8"
+                             KeyDown="NameInputBox_KeyDown"/>
+
+                    <!-- Validation error label (hidden until needed) -->
+                    <TextBlock x:Name="NameErrorLabel"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               Foreground="#ff5252"
+                               Visibility="Collapsed"
+                               Margin="0,0,0,8"
+                               TextWrapping="Wrap"/>
+
+                    <!-- Start button -->
+                    <Button x:Name="StartButton"
+                            Content="Start Chat  →"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="42"
+                            Click="StartButton_Click"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>
