@@ -20,3 +20,6 @@ C:\Users\pheny\OneDrive\Documents\2026\semester 1\Programming 2A PROG6221\prog62
 C:\Users\pheny\OneDrive\Documents\2026\semester 1\Programming 2A PROG6221\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Debug\net8.0-windows\ref\CybersecurityChatbot.dll
 C:\Users\pheny\OneDrive\Documents\2026\semester 1\Programming 2A PROG6221\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\bin\Debug\net8.0-windows\Greeting.wav
 C:\Users\pheny\OneDrive\Documents\2026\semester 1\Programming 2A PROG6221\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Debug\net8.0-windows\CybersecurityChatbot_Content.g.cs
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatBot\obj\Debug\net8.0-windows\CybersecurityChatbot.dll
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatBot\obj\Debug\net8.0-windows\refint\CybersecurityChatbot.dll
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatBot\obj\Debug\net8.0-windows\CybersecurityChatbot.pdb
