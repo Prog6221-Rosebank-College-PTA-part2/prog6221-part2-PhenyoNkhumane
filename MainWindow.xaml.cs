@@ -94,9 +94,7 @@ public partial class MainWindow : Window
 
         if (result.IsExit)
         {
-            UserInputBox.IsEnabled = false;
-            SendButton.IsEnabled   = false;
-            AppendSystemMessage("Session ended. Close the window or restart to begin again.");
+            AppendSystemMessage("Session ended. You can keep typing to continue the conversation.");
         }
 
         UserInputBox.Focus();
