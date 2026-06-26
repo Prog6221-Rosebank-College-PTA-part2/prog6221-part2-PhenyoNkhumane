@@ -309,7 +309,7 @@
                         Padding="10"
                         Margin="0,0,0,8">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Search & filter tasks"
+                                <TextBlock Text="Search &amp; filter tasks"
                                    FontFamily="Consolas"
                                    FontSize="12"
                                    Foreground="#e0e0e0"
