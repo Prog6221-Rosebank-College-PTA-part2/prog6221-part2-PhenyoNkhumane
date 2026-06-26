@@ -14,7 +14,7 @@ public static class ResponseCatalog
 
     /// <summary>Returned when input does not match any known topic.</summary>
     public const string DefaultResponse =
-        "I didn't quite understand that. Try asking about phishing, passwords, 2FA, safe browsing, or use chat commands like \"start quiz\", \"view tasks\", or \"show activity log\".";
+        "I didn’t quite catch that. Could you rephrase it or ask about phishing, password safety, malware, safe browsing, or 2FA?";
 
     // -------------------------------------------------------------------------
     // Topic name constants
@@ -271,7 +271,7 @@ public static class ResponseCatalog
             "two-factor authentication, or public Wi-Fi. You can also ask how I am or what I'm for!"),
 
         // --- Cybersecurity topics ---
-        (new[] { "phishing", "phish", "scam", "scams", "scammer", "spam", "spam email", "suspicious email", "fake email", "spoofed email", "sms scam", "smishing", "vishing", "fake website", "impersonation" },
+        (new[] { "phishing", "phish", "scam", "scams", "scammer", "spam", "spam email", "suspicious email", "fake email", "spoofed email", "sms scam", "smishing", "vishing", "fake website", "impersonation", "phishing attack", "malicious email", "email scam" },
             TopicPhishing,
             "Phishing tricks you into revealing secrets or clicking bad links. Verify the sender, " +
             "don't open unexpected attachments, and go directly to sites by typing the URL—not from urgent email links."),
@@ -281,7 +281,7 @@ public static class ResponseCatalog
             "Pharming redirects you to a fake website even when the address looks correct. " +
             "Always type sensitive URLs directly, bookmark trusted sites, and avoid suspicious DNS services."),
 
-        (new[] { "password", "passwords", "passphrase", "credential", "weak password", "password manager" },
+        (new[] { "password", "passwords", "passphrase", "credential", "weak password", "password manager", "password safety", "strong password", "secure password", "password hygiene" },
             TopicPassword,
             "Use long, unique passphrases for important accounts. A password manager helps you generate " +
             "and store them safely—never reuse passwords across sites or share them."),
@@ -291,22 +291,22 @@ public static class ResponseCatalog
             "Authentication is more than a password. Use strong login details, protect OTPs and PINs, " +
             "and enable MFA whenever possible."),
 
-        (new[] { "2fa", "mfa", "two factor", "multi factor", "authenticator", "second factor" },
+        (new[] { "2fa", "mfa", "two factor", "multi factor", "authenticator", "second factor", "two-factor authentication", "multi-factor authentication", "two factor authentication", "multi factor authentication" },
             TopicTwoFactor,
             "Multi-factor authentication adds a second step after your password. " +
             "Prefer an authenticator app or hardware key over SMS codes when possible."),
 
-        (new[] { "malware", "virus", "trojan", "spyware", "keylogger", "adware", "worm" },
+        (new[] { "malware", "virus", "trojan", "spyware", "keylogger", "adware", "worm", "malicious software", "computer virus" },
             TopicMalware,
             "Malware is harmful software that steals data or damages your system. " +
             "Keep your OS updated, use reputable security software, and avoid suspicious downloads."),
 
-        (new[] { "social engineering", "pretext", "scam call", "vishing", "impersonation" },
+        (new[] { "social engineering", "social engineering attack", "pretext", "scam call", "vishing", "impersonation" },
             TopicSocialEng,
             "Social engineering manipulates people into breaking security rules. " +
             "Always verify unexpected requests through a trusted channel, and never give info to unsolicited callers."),
 
-        (new[] { "safe browsing", "https", "check url", "suspicious link", "clickjacking" },
+        (new[] { "safe browsing", "safe browsing", "browse safely", "secure browsing", "web safety", "https", "check url", "suspicious link", "clickjacking" },
             TopicSafeBrowsing,
             "Check that sites use HTTPS (padlock icon), avoid unknown short links, " +
             "don't ignore browser warnings, and be cautious with downloads from unfamiliar sites."),

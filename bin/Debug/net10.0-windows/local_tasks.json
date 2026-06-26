@@ -21,8 +21,32 @@
       "QuizAverageScore": 0,
       "TotalTasks": 0,
       "CompletedTasks": 0,
-      "LastLogin": "2026-06-26T22:43:30.5550527+02:00",
+      "LastLogin": "2026-06-26T23:47:00.227675+02:00",
       "CreatedAt": "2026-06-26T22:43:30.5422108+02:00"
+    },
+    {
+      "Id": 3,
+      "Name": "Vicky",
+      "FavouriteTopic": null,
+      "BestQuizScore": 0,
+      "QuizAttempts": 0,
+      "QuizAverageScore": 0,
+      "TotalTasks": 0,
+      "CompletedTasks": 0,
+      "LastLogin": "2026-06-26T23:48:40.4955518+02:00",
+      "CreatedAt": "2026-06-26T23:48:40.4831781+02:00"
+    },
+    {
+      "Id": 4,
+      "Name": "Favour",
+      "FavouriteTopic": null,
+      "BestQuizScore": 0,
+      "QuizAttempts": 0,
+      "QuizAverageScore": 0,
+      "TotalTasks": 0,
+      "CompletedTasks": 0,
+      "LastLogin": "2026-06-26T23:59:20.1570904+02:00",
+      "CreatedAt": "2026-06-26T23:59:20.1460492+02:00"
     }
   ],
   "Tasks": [
@@ -173,6 +197,24 @@
       "UserId": 2,
       "Description": "Processed feature command: Help",
       "Timestamp": "2026-06-26T22:48:02.589754+02:00"
+    },
+    {
+      "Id": 22,
+      "UserId": 4,
+      "Description": "Recognised NLP intent: ShowStatistics.",
+      "Timestamp": "2026-06-27T00:20:38.4361715+02:00"
+    },
+    {
+      "Id": 23,
+      "UserId": 4,
+      "Description": "User requested statistics.",
+      "Timestamp": "2026-06-27T00:20:38.4414881+02:00"
+    },
+    {
+      "Id": 24,
+      "UserId": 4,
+      "Description": "Processed feature command: Show statistics",
+      "Timestamp": "2026-06-27T00:20:38.442147+02:00"
     }
   ],
   "Settings": []

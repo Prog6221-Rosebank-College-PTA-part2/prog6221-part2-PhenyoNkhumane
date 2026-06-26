@@ -67,7 +67,8 @@ public static class NlpIntentDetector
         "remind me", "set a reminder", "set reminder", "schedule reminder",
         "reminder for", "remind me to", "can you remind me", "don't let me forget",
         "please remind me", "could you remind me", "make reminder", "remember this",
-        "i need to remember", "remind me later", "remind me in"
+        "i need to remember", "remind me later", "remind me in", "task reminder",
+        "reminder task"
     };
 
     private static readonly string[] ImplicitTaskPhrases =
@@ -83,7 +84,8 @@ public static class NlpIntentDetector
     private static readonly string[] QuizPhrases =
     {
         "start quiz", "play quiz", "begin quiz", "quiz me", "cyber quiz",
-        "start the quiz", "play the quiz", "mini game", "start game", "take quiz"
+        "start the quiz", "play the quiz", "mini game", "start game", "take quiz",
+        "show quiz", "resume quiz", "continue quiz", "take the quiz"
     };
 
     private static readonly string[] ActivityLogPhrases =
