@@ -65,8 +65,37 @@ public static class TaskDatabase
             throw new ArgumentException("Name cannot be empty.", nameof(name));
 
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return 0;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                EnsureFallbackSeeded();
+                string normalizedName = name.Trim();
+                var existing = _fallbackUsers.FirstOrDefault(u => u.Name.Equals(normalizedName, StringComparison.OrdinalIgnoreCase));
+                if (existing == null)
+                {
+                    existing = new FallbackUser
+                    {
+                        Id = _fallbackNextUserId++,
+                        Name = normalizedName,
+                        CreatedAt = DateTime.Now,
+                        LastLogin = DateTime.Now
+                    };
+                    _fallbackUsers.Add(existing);
+                }
+                else
+                {
+                    existing.LastLogin = DateTime.Now;
+                }
+
+                _currentUserId = existing.Id;
+                SaveFallbackData();
+                return existing.Id;
+            }
+        }
 
         using var conn = OpenConnection();
         using var insertCmd = conn.CreateCommand();
@@ -132,8 +161,17 @@ public static class TaskDatabase
     public static bool TaskExists(string title)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                EnsureFallbackSeeded();
+                return _fallbackTasks.Any(t => t.UserId == _currentUserId && t.Title.Equals(title.Trim(), StringComparison.OrdinalIgnoreCase));
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -232,8 +270,29 @@ public static class TaskDatabase
     public static CyberTask? GetTaskById(int id)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return null;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var task = _fallbackTasks.FirstOrDefault(t => t.Id == id && t.UserId == _currentUserId);
+                if (task == null)
+                    return null;
+
+                return new CyberTask
+                {
+                    Id = task.Id,
+                    Title = task.Title,
+                    Description = task.Description,
+                    ReminderDate = task.ReminderDate,
+                    DueDate = task.DueDate,
+                    IsCompleted = task.IsCompleted,
+                    CreatedAt = task.CreatedAt
+                };
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -264,11 +323,33 @@ public static class TaskDatabase
     public static bool EditTask(int id, string? title, string? description, DateTime? reminderDate, DateTime? dueDate)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return false;
 
         if (title == null && description == null && reminderDate == null && dueDate == null)
             return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var task = _fallbackTasks.FirstOrDefault(t => t.Id == id && t.UserId == _currentUserId);
+                if (task == null)
+                    return false;
+
+                if (title != null)
+                    task.Title = title.Trim();
+                if (description != null)
+                    task.Description = description.Trim();
+                if (reminderDate != null)
+                    task.ReminderDate = reminderDate.Value;
+                if (dueDate != null)
+                    task.DueDate = dueDate.Value;
+
+                SaveFallbackData();
+                return true;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -310,8 +391,22 @@ public static class TaskDatabase
     public static bool DeleteTask(int id)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var task = _fallbackTasks.FirstOrDefault(t => t.Id == id && t.UserId == _currentUserId);
+                if (task == null)
+                    return false;
+
+                _fallbackTasks.Remove(task);
+                SaveFallbackData();
+                return true;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -327,8 +422,22 @@ public static class TaskDatabase
     public static bool MarkCompleted(int id)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var task = _fallbackTasks.FirstOrDefault(t => t.Id == id && t.UserId == _currentUserId);
+                if (task == null)
+                    return false;
+
+                task.IsCompleted = true;
+                SaveFallbackData();
+                return true;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -462,8 +571,17 @@ public static class TaskDatabase
     public static int GetHighScore()
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return 0;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var user = _fallbackUsers.FirstOrDefault(u => u.Id == _currentUserId);
+                return user?.BestQuizScore ?? 0;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -479,8 +597,32 @@ public static class TaskDatabase
     public static UserProfile? GetUserProfile(int userId)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return null;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var user = _fallbackUsers.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                    return null;
+
+                return new UserProfile
+                {
+                    UserId = user.Id,
+                    Name = user.Name,
+                    FavouriteTopic = user.FavouriteTopic,
+                    QuizBestScore = user.BestQuizScore,
+                    QuizAttempts = user.QuizAttempts,
+                    QuizAverageScore = user.QuizAverageScore,
+                    TotalTasks = user.TotalTasks,
+                    CompletedTasks = user.CompletedTasks,
+                    LastLogin = user.LastLogin,
+                    CreatedAt = user.CreatedAt
+                };
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -513,8 +655,38 @@ public static class TaskDatabase
     public static bool UpdateUserStatistics(int userId, string? favouriteTopic = null, int? quizScore = null, int? totalTasks = null, int? completedTasks = null)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var user = _fallbackUsers.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                    return false;
+
+                if (!string.IsNullOrEmpty(favouriteTopic))
+                    user.FavouriteTopic = favouriteTopic;
+
+                if (quizScore.HasValue)
+                {
+                    user.BestQuizScore = Math.Max(user.BestQuizScore, quizScore.Value);
+                    user.QuizAttempts += 1;
+                    user.QuizAverageScore = (user.QuizAverageScore + quizScore.Value) / Math.Max(1, user.QuizAttempts);
+                }
+
+                if (totalTasks.HasValue)
+                    user.TotalTasks = totalTasks.Value;
+
+                if (completedTasks.HasValue)
+                    user.CompletedTasks = completedTasks.Value;
+
+                user.LastLogin = DateTime.Now;
+                SaveFallbackData();
+                return true;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -635,8 +807,24 @@ public static class TaskDatabase
     public static bool UpdateUserSettings(int userId, AppSettings settings)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                if (!_fallbackSettings.ContainsKey(userId))
+                    _fallbackSettings[userId] = new FallbackSettings { UserId = userId };
+
+                var current = _fallbackSettings[userId];
+                current.DarkMode = settings.DarkMode;
+                current.EnableSounds = settings.EnableSounds;
+                current.VoiceGreeting = settings.VoiceGreeting;
+                SaveFallbackData();
+                return true;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
