@@ -60,6 +60,16 @@ public static class NlpIntentDetector
         "reminder for", "remind me to", "can you remind me", "don't let me forget"
     };
 
+    private static readonly string[] ImplicitTaskPhrases =
+    {
+        "enable 2fa", "enable two-factor", "enable two factor", "enable mfa",
+        "turn on 2fa", "turn on two-factor", "turn on two factor",
+        "update password", "change password", "reset password",
+        "review privacy settings", "check privacy settings", "review account privacy",
+        "backup files", "back up files", "install updates", "install security updates",
+        "secure my account", "secure my device", "protect my account"
+    };
+
     private static readonly string[] QuizPhrases =
     {
         "start quiz", "play quiz", "begin quiz", "quiz me", "cyber quiz",
@@ -143,10 +153,10 @@ public static class NlpIntentDetector
             return result;
         }
 
-        if (ContainsAny(input, AddTaskPhrases))
+        if (ContainsAny(input, AddTaskPhrases) || ContainsAny(input, ImplicitTaskPhrases))
         {
             result.Intent = Intent.AddTask;
-            result.TaskTitle = ExtractTaskTitleFromAddPhrase(rawInput, input);
+            result.TaskTitle = ExtractTaskTitleFromAddPhrase(rawInput, input) ?? ExtractImplicitTaskTitle(rawInput, input);
             return result;
         }
 
@@ -225,7 +235,51 @@ public static class NlpIntentDetector
             return CleanTitle(remainder);
         }
 
+        if (ContainsAny(lower, ImplicitTaskPhrases))
+            return ExtractImplicitTaskTitle(raw, lower);
+
         return ExtractLooseTaskTitle(raw);
+    }
+
+    private static string? ExtractImplicitTaskTitle(string raw, string lower)
+    {
+        foreach (string phrase in ImplicitTaskPhrases)
+        {
+            if (lower.Contains(phrase))
+            {
+                string title = phrase;
+
+                if (title.StartsWith("enable ", StringComparison.OrdinalIgnoreCase) ||
+                    title.StartsWith("turn on ", StringComparison.OrdinalIgnoreCase))
+                {
+                    return CleanTitle(title.Replace("enable ", "Enable ").Replace("turn on ", "Enable "));
+                }
+
+                if (title.Contains("password"))
+                {
+                    return "Update password";
+                }
+
+                if (title.Contains("privacy") && title.Contains("settings"))
+                {
+                    return "Review privacy settings";
+                }
+
+                if (title.Contains("backup"))
+                {
+                    return "Back up files";
+                }
+
+                if (title.Contains("install updates"))
+                {
+                    return "Install updates";
+                }
+
+                return CleanTitle(title);
+            }
+        }
+
+        return null;
     }
 
     private static string? ExtractLooseTaskTitle(string raw)
