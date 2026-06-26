@@ -28,6 +28,7 @@ public static class ResponseCatalog
     public const string TopicSafeBrowsing    = "safe browsing";
     public const string TopicWifi            = "wifi";
     public const string TopicTwoFactor       = "2fa";
+    public const string TopicAuthentication  = "authentication";
     public const string TopicRansomware      = "ransomware";
     public const string TopicVpn             = "vpn";
     public const string TopicBackup          = "backup";
@@ -107,6 +108,15 @@ public static class ResponseCatalog
                 "Store your 2FA backup codes somewhere safe offline in case you lose your phone.",
                 "Hardware security keys like YubiKey offer the strongest form of two-factor authentication.",
                 "Even if someone has your password, 2FA stops them from logging in without your second device."
+            },
+
+            [TopicAuthentication] = new List<string>
+            {
+                "Use strong login credentials and keep your username and password unique for every account.",
+                "Treat one-time passwords (OTP) like passwords—never share them with anyone.",
+                "A secure PIN is short and memorable but not easy to guess. Avoid 1234, 0000, or your birthday.",
+                "Biometric options like fingerprint and Face ID are convenient, but pair them with a strong password or PIN.",
+                "Authentication is stronger when you combine something you know with something you have or are."
             },
 
             [TopicRansomware] = new List<string>
@@ -261,7 +271,7 @@ public static class ResponseCatalog
             "two-factor authentication, or public Wi-Fi. You can also ask how I am or what I'm for!"),
 
         // --- Cybersecurity topics ---
-        (new[] { "phishing", "phish", "scam", "scams", "spam email", "suspicious email", "fake email", "spoofed email" },
+        (new[] { "phishing", "phish", "scam", "scams", "scammer", "spam", "spam email", "suspicious email", "fake email", "spoofed email", "sms scam", "smishing", "vishing", "fake website", "impersonation" },
             TopicPhishing,
             "Phishing tricks you into revealing secrets or clicking bad links. Verify the sender, " +
             "don't open unexpected attachments, and go directly to sites by typing the URL—not from urgent email links."),
@@ -271,17 +281,22 @@ public static class ResponseCatalog
             "Pharming redirects you to a fake website even when the address looks correct. " +
             "Always type sensitive URLs directly, bookmark trusted sites, and avoid suspicious DNS services."),
 
-        (new[] { "password", "passphrase", "credential", "weak password", "password manager" },
+        (new[] { "password", "passwords", "passphrase", "credential", "weak password", "password manager" },
             TopicPassword,
             "Use long, unique passphrases for important accounts. A password manager helps you generate " +
             "and store them safely—never reuse passwords across sites or share them."),
+
+        (new[] { "username", "login", "sign in", "authentication", "biometric", "otp", "pin", "credential" },
+            TopicAuthentication,
+            "Authentication is more than a password. Use strong login details, protect OTPs and PINs, " +
+            "and enable MFA whenever possible."),
 
         (new[] { "2fa", "mfa", "two factor", "multi factor", "authenticator", "second factor" },
             TopicTwoFactor,
             "Multi-factor authentication adds a second step after your password. " +
             "Prefer an authenticator app or hardware key over SMS codes when possible."),
 
-        (new[] { "malware", "virus", "trojan", "spyware", "keylogger" },
+        (new[] { "malware", "virus", "trojan", "spyware", "keylogger", "adware", "worm" },
             TopicMalware,
             "Malware is harmful software that steals data or damages your system. " +
             "Keep your OS updated, use reputable security software, and avoid suspicious downloads."),
@@ -321,7 +336,7 @@ public static class ResponseCatalog
             "Follow the 3-2-1 backup rule: three copies, two media types, one off-site. " +
             "This protects you from ransomware, theft, and accidental deletion."),
 
-        (new[] { "privacy", "tracking", "cookies", "personal data", "data breach" },
+        (new[] { "privacy", "personal information", "identity", "identity theft", "location", "permissions", "cookies", "tracking", "data", "personal data", "data breach" },
             TopicPrivacy,
             "Limit what you share online, review app permissions regularly, use account privacy settings, " +
             "and use unique passwords everywhere so a breach on one site doesn't affect others."),
@@ -336,7 +351,7 @@ public static class ResponseCatalog
             "If something has gone wrong: disconnect if needed, change passwords from a clean device, " +
             "enable MFA, contact your bank or IT team, and report phishing to your email provider or authorities."),
 
-        (new[] { "cybersecurity", "cyber security", "information security", "infosec", "online safety" },
+        (new[] { "cybersecurity", "cyber security", "information security", "infosec", "online safety", "cyber", "hacker", "hacking", "cybercrime", "breach", "exploit", "vulnerability", "antivirus", "defender" },
             null,
             "Cybersecurity is about protecting your devices, accounts, and data from theft or harm. " +
             "Strong passwords, regular updates, scepticism toward unexpected messages, and backups cover most risks."),
