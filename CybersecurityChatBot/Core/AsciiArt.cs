@@ -39,6 +39,7 @@ class AsciiArt
         boxed.Add(bottom);
         boxed.Add(string.Empty);
         boxed.Add("Tip: Ask about phishing, passwords, 2FA, malware, or safe browsing.");
+        boxed.Add("Part 3: Try \"Add task\", \"Start quiz\", or \"Show activity log\".");
         boxed.Add("Type 'exit' or 'bye' at any time to end the session.");
         boxed.Add(string.Empty);
 

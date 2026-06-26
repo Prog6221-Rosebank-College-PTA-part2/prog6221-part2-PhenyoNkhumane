@@ -20,6 +20,11 @@ public class ChatBot
     /// </summary>
     private readonly ConversationManager _conversation = new ConversationManager();
 
+    static ChatBot()
+    {
+        TaskDatabase.Initialize();
+    }
+
     /// <summary>
     /// Whether the user has been welcomed yet.
     /// Used by MainWindow to decide whether to show the name prompt.
@@ -53,7 +58,9 @@ public class ChatBot
     /// </summary>
     public string GetWelcomeMessage()
     {
-        return AsciiArt.GetWelcomeMessage(MemoryStore.UserName);
+        string welcome = AsciiArt.GetWelcomeMessage(MemoryStore.UserName);
+        string dbNote = _conversation.GetPart3Features().GetDatabaseStatusMessage();
+        return $"{welcome}\n📋 {dbNote}";
     }
 
     // -------------------------------------------------------------------------
@@ -106,6 +113,22 @@ public class ChatBot
     /// Returns the stored user name for use in UI labels.
     /// </summary>
     public string GetUserName() => MemoryStore.UserName;
+
+    public IReadOnlyList<CyberTask> GetTasks() =>
+        _conversation.GetPart3Features().GetTasks();
+
+    public bool QuizIsActive =>
+        _conversation.GetPart3Features().QuizIsActive;
+
+    public string GetQuizStatusText()
+    {
+        var p3 = _conversation.GetPart3Features();
+        if (!p3.QuizIsActive)
+            return "No quiz in progress";
+        return $"Quiz: Q{p3.QuizQuestionNumber}/{p3.QuizTotalQuestions} — Score: {p3.QuizScore}";
+    }
+
+    public ChatBotResponse ProcessQuickCommand(string command) => ProcessMessage(command);
 
     /// <summary>
     /// Resets the session — clears memory and starts a fresh conversation.

@@ -23,6 +23,7 @@ class ConversationManager
     public string? LastTopic { get; private set; }
 
     private int _tipCycleIndex;
+    private readonly Part3FeatureManager _part3 = new Part3FeatureManager();
 
     // ─── Follow-up phrases ────────────────────────────────────────────────────
     // These are checked BEFORE sentiment detection so that "tell me more"
@@ -101,11 +102,16 @@ class ConversationManager
 
         string input = rawInput.ToLowerInvariant().Trim();
 
-        // ── 1. Memory query (explicit: "what do you remember about me?") ──────
+        // ── 1. Part 3: tasks, quiz, activity log, NLP intents ───────────────────
+        string? part3Response = _part3.TryHandle(rawInput);
+        if (part3Response != null)
+            return part3Response;
+
+        // ── 2. Memory query (explicit: "what do you remember about me?") ──────
         if (IsMemoryQuery(input))
             return BuildMemoryReport();
 
-        // ── 2. Interest capture ───────────────────────────────────────────────
+        // ── 3. Interest capture ───────────────────────────────────────────────
         // Must run before follow-up check because "I'm interested in X" also
         // contains "in" which could confuse generic matchers.
         string? interestTopic = TryExtractInterest(input);
@@ -116,11 +122,11 @@ class ConversationManager
             return MemoryStore.GetTopicSavedConfirmation();
         }
 
-        // ── 3. Follow-up handling ─────────────────────────────────────────────
+        // ── 4. Follow-up handling ─────────────────────────────────────────────
         if (IsFollowUp(input))
             return HandleFollowUp();
 
-        // ── 4. Sentiment detection ────────────────────────────────────────────
+        // ── 5. Sentiment detection ────────────────────────────────────────────
         // Runs after follow-up so "tell me more" / "explain" never reach here.
         string? sentimentResponse = SentimentDetector.DetectAndRespond(rawInput, LastTopic);
         if (sentimentResponse != null)
@@ -132,7 +138,7 @@ class ConversationManager
                 : sentimentResponse;
         }
 
-        // ── 5. Keyword / topic response ───────────────────────────────────────
+        // ── 6. Keyword / topic response ───────────────────────────────────────
         string response = ResponseCatalog.GetResponse(input, out string? matchedTopic);
 
         if (matchedTopic != null)
@@ -333,4 +339,6 @@ class ConversationManager
 
         return null;
     }
+
+    public Part3FeatureManager GetPart3Features() => _part3;
 }

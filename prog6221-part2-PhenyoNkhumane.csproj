@@ -12,5 +12,9 @@
   <ItemGroup>
     <Compile Remove="Program.cs" />
     <Content Include="CybersecurityChatBot\Greeting.wav" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="dbconfig.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
   </ItemGroup>
 </Project>
