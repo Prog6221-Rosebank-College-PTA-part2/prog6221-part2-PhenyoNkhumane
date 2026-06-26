@@ -42,7 +42,7 @@ public partial class App : System.Windows.Application {
     /// InitializeComponent
     /// </summary>
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.8.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.9.0")]
     public void InitializeComponent() {
         
         #line 4 "..\..\..\App.xaml"
@@ -57,7 +57,7 @@ public partial class App : System.Windows.Application {
     /// </summary>
     [System.STAThreadAttribute()]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.8.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.9.0")]
     public static void Main() {
         App app = new App();
         app.InitializeComponent();
