@@ -78,6 +78,7 @@ public class TaskAssistant
         try
         {
             int id = TaskDatabase.AddTask(title, description, reminderDate, dueDate);
+            UpdateTaskStats();
             ActivityLog.Log($"Task added: '{title}'.");
 
             string reminderLine = reminderDate.HasValue
@@ -104,6 +105,7 @@ public class TaskAssistant
             if (!success)
                 return $"I couldn't update task {id}.";
 
+            UpdateTaskStats();
             ActivityLog.Log($"Task completed: '{task.Title}'.");
             return "✓ Task marked as completed.\n\nWell done!";
         }
@@ -125,6 +127,7 @@ public class TaskAssistant
             if (!success)
                 return $"I couldn't delete task {id}.";
 
+            UpdateTaskStats();
             ActivityLog.Log($"Task deleted: '{task.Title}'.");
             return "🗑 Task deleted successfully.";
         }
@@ -382,6 +385,14 @@ public class TaskAssistant
         }
 
         return $"⚠ I couldn't {action} right now.";
+    }
+
+    private static void UpdateTaskStats()
+    {
+        var tasks = TaskDatabase.GetAllTasks();
+        int total = tasks.Count;
+        int completed = tasks.Count(task => task.IsCompleted);
+        TaskDatabase.UpdateUserStatistics(TaskDatabase.CurrentUserId, totalTasks: total, completedTasks: completed);
     }
 
     private void ClearPending()

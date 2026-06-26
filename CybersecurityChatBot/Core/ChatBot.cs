@@ -50,7 +50,8 @@ public class ChatBot
             return "Name cannot be empty — please enter your name to continue.";
 
         MemoryStore.SetUserName(rawName.Trim());
-        TaskDatabase.AddOrGetUser(rawName.Trim());
+        int userId = TaskDatabase.AddOrGetUser(rawName.Trim());
+        TaskDatabase.UpdateUserStatistics(userId);
         SessionStarted = true;
         return null; // null = success, no error
     }

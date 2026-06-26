@@ -526,8 +526,26 @@ public static class TaskDatabase
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(100) NOT NULL UNIQUE,
+                favourite_topic VARCHAR(100) NULL,
+                quiz_best_score INT NOT NULL DEFAULT 0,
+                quiz_attempts INT NOT NULL DEFAULT 0,
+                quiz_average_score INT NOT NULL DEFAULT 0,
+                total_tasks INT NOT NULL DEFAULT 0,
+                completed_tasks INT NOT NULL DEFAULT 0,
+                last_login DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
             );";
+        cmd.ExecuteNonQuery();
+
+        cmd.CommandText = @"
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS favourite_topic VARCHAR(100) NULL,
+            ADD COLUMN IF NOT EXISTS quiz_best_score INT NOT NULL DEFAULT 0,
+            ADD COLUMN IF NOT EXISTS quiz_attempts INT NOT NULL DEFAULT 0,
+            ADD COLUMN IF NOT EXISTS quiz_average_score INT NOT NULL DEFAULT 0,
+            ADD COLUMN IF NOT EXISTS total_tasks INT NOT NULL DEFAULT 0,
+            ADD COLUMN IF NOT EXISTS completed_tasks INT NOT NULL DEFAULT 0,
+            ADD COLUMN IF NOT EXISTS last_login DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;";
         cmd.ExecuteNonQuery();
 
         cmd.CommandText = @"

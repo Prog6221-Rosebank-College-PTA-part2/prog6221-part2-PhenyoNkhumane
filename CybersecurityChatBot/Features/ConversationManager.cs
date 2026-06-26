@@ -158,6 +158,7 @@ class ConversationManager
         {
             ActivityLog.Log($"Responded on topic: {matchedTopic}.");
             UpdateTopic(matchedTopic);
+            TaskDatabase.UpdateUserStatistics(TaskDatabase.CurrentUserId, favouriteTopic: matchedTopic);
 
             // Append a recall line if this topic differs from the stored
             // favourite — same as v1 — but NOW also append on every 4th
