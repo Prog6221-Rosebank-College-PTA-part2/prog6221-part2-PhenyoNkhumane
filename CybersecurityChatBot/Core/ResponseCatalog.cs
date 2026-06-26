@@ -213,6 +213,22 @@ public static class ResponseCatalog
             "backups, Wi-Fi safety, privacy, VPNs, ransomware, encryption, and reporting incidents. " +
             "Type a topic or ask in your own words."),
 
+        (new[] { "tips", "security tips", "cybersecurity tips", "best practices", "best practices for security", "cyber safety tips", "online safety tips", "security advice" },
+            null,
+            "Here are some core cybersecurity tips:\n" +
+            "  ✔ Use strong, unique passwords.\n" +
+            "  ✔ Enable multi-factor authentication (MFA).\n" +
+            "  ✔ Watch out for phishing emails and messages.\n" +
+            "  ✔ Keep software and devices updated.\n" +
+            "  ✔ Avoid unsecured public Wi-Fi for sensitive tasks.\n" +
+            "  ✔ Back up important files regularly.\n" +
+            "  ✔ Limit personal information shared online.\n" +
+            "  ✔ Download apps only from trusted sources.\n" +
+            "  ✔ Monitor financial and online accounts.\n" +
+            "  ✔ Use encryption and secure websites (HTTPS).\n" +
+            "  ✔ Securely erase data before disposing of devices.\n" +
+            "  ✔ Stay informed about the latest cybersecurity threats."),
+
         (new[] { "menu", "list commands", "options" },
             null,
             "Try asking about: passwords, phishing, pharming, safe browsing, malware, " +
