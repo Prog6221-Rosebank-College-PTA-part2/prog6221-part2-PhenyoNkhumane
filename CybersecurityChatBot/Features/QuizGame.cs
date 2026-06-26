@@ -13,11 +13,20 @@ public class QuizGame
     private int _currentIndex;
     private int _score;
     private bool _active;
+    private int _correctAnswers;
+    private int _wrongAnswers;
+    private bool _quizStarted;
+    private bool _quizFinished;
 
     public bool IsActive => _active;
     public int CurrentQuestionNumber => _active ? _currentIndex + 1 : 0;
     public int TotalQuestions => _questions.Count;
     public int CurrentScore => _score;
+    public int CurrentQuestion => _active ? _currentIndex + 1 : 0;
+    public int CorrectAnswers => _correctAnswers;
+    public int WrongAnswers => _wrongAnswers;
+    public bool QuizStarted => _quizStarted;
+    public bool QuizFinished => _quizFinished;
 
     public QuizGame()
     {
@@ -26,46 +35,71 @@ public class QuizGame
 
     public string Start()
     {
+        // Step 2 — Initialise Variables
         _currentIndex = 0;
         _score = 0;
+        _correctAnswers = 0;
+        _wrongAnswers = 0;
+        _quizFinished = false;
+        _quizStarted = true;
         _active = true;
 
-        ActivityLog.Log("Quiz started.");
-        return "🎮 Cybersecurity Quiz started!\n\n" + FormatCurrentQuestion();
+        ActivityLog.Log("Quiz Started");
+        return FormatCurrentQuestion();
     }
 
     public string? ProcessAnswer(string rawInput)
     {
         if (!_active)
             return null;
-
-        int? choice = ParseAnswer(rawInput, _questions[_currentIndex]);
-        if (!choice.HasValue)
+        // Step 4 & 5 — Wait for input & Validate
+        QuizQuestion question = _questions[_currentIndex];
+        int? parsed = ParseAnswerStrict(rawInput, question);
+        if (!parsed.HasValue)
         {
-            return "Please answer with A, B, C, D, True, or False.\n\n" + FormatCurrentQuestion();
+            return "⚠ Invalid answer.\nPlease answer using A, B, C, D, True, or False\n\n" + FormatCurrentQuestion();
         }
 
-        QuizQuestion question = _questions[_currentIndex];
-        bool correct = choice.Value == question.CorrectIndex;
+        bool correct = parsed.Value == question.CorrectIndex;
+        var sb = new StringBuilder();
 
         if (correct)
+        {
+            // Step 6 — If correct
             _score++;
+            _correctAnswers++;
+            sb.AppendLine("✔ Correct!");
+            sb.AppendLine(question.Explanation);
+            sb.AppendLine($"+1 point");
+            ActivityLog.Log($"Question {_currentIndex + 1} Correct");
+        }
+        else
+        {
+            // Step 6 — If wrong
+            _wrongAnswers++;
+            sb.AppendLine("❌ Incorrect.");
+            sb.AppendLine($"The correct answer is {question.GetCorrectShortLabel()}");
+            sb.AppendLine($"Why? {question.Explanation}");
+            ActivityLog.Log($"Question {_currentIndex + 1} Incorrect");
+        }
 
-        var sb = new StringBuilder();
-        sb.AppendLine(correct
-            ? "✅ Correct!"
-            : $"❌ Not quite. The correct answer was {question.GetCorrectLabel()}.");
-        sb.AppendLine($"💡 {question.Explanation}");
-
+        // Step 8 — Next question automatically
         _currentIndex++;
 
         if (_currentIndex >= _questions.Count)
         {
             _active = false;
+            _quizFinished = true;
+            // Step 10 — Final results
             sb.AppendLine();
-            sb.AppendLine(GetFinalSummary());
-            ActivityLog.Log($"Quiz completed — score {_score}/{_questions.Count}.");
-            return sb.ToString().TrimEnd();
+            sb.AppendLine(FormatFinalResults());
+            // Step 12 — Save quiz result
+            SaveQuizResult();
+            ActivityLog.Log($"Quiz Completed — Score {_score}/{_questions.Count}");
+            // Step 13 — Return to chat mode state
+            _quizStarted = false;
+            _currentIndex = 0;
+            return sb.ToString().TrimEnd() + "\n\nYou're now back in normal chat mode. You can ask cybersecurity questions, manage tasks, or start another quiz whenever you like.";
         }
 
         sb.AppendLine();
@@ -80,17 +114,19 @@ public class QuizGame
 
         QuizQuestion q = _questions[_currentIndex];
         var sb = new StringBuilder();
-        sb.AppendLine($"Question {_currentIndex + 1} of {_questions.Count} (Score: {_score})");
-        sb.AppendLine();
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        sb.AppendLine($"Question {_currentIndex + 1} of {_questions.Count}    Current Score {_score}");
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         sb.AppendLine(q.Question);
 
         char label = 'A';
         foreach (string option in q.Options)
         {
-            sb.AppendLine($"  {label}) {option}");
+            sb.AppendLine($"{label}) {option}");
             label++;
         }
 
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         return sb.ToString().TrimEnd();
     }
 
@@ -110,23 +146,90 @@ public class QuizGame
     {
         string trimmed = input.Trim().ToUpperInvariant();
 
+        // Legacy lenient parser — keep but prefer the strict parser used by the game loop.
         if (question.IsTrueFalse)
         {
-            if (trimmed is "TRUE" or "T" or "YES")
+            if (trimmed == "TRUE" || trimmed == "T")
                 return 0;
-            if (trimmed is "FALSE" or "F" or "NO")
+            if (trimmed == "FALSE" || trimmed == "F")
                 return 1;
             return null;
         }
 
-        Match letter = Regex.Match(trimmed, @"^[A-D]$");
+        Match letter = Regex.Match(trimmed, "^[A-D]");
         if (letter.Success)
             return letter.Value[0] - 'A';
 
-        if (int.TryParse(trimmed, out int num) && num >= 1 && num <= question.Options.Count)
-            return num - 1;
-
         return null;
+    }
+
+    // Strict parser that enforces the allowed inputs per spec
+    private static int? ParseAnswerStrict(string input, QuizQuestion question)
+    {
+        string trimmed = input.Trim();
+        if (string.IsNullOrEmpty(trimmed))
+            return null;
+
+        string up = trimmed.ToUpperInvariant();
+
+        // Accept only A,B,C,D for multiple choice
+        if (!question.IsTrueFalse)
+        {
+            if (Regex.IsMatch(up, "^[A-D]$"))
+                return up[0] - 'A';
+            return null;
+        }
+
+        // True/False questions — accept only True/False (case-insensitive)
+        if (up == "TRUE")
+            return 0;
+        if (up == "FALSE")
+            return 1;
+        return null;
+    }
+
+    private void SaveQuizResult()
+    {
+        try
+        {
+            string folder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "database");
+            string path = System.IO.Path.Combine(folder, "quiz_results.txt");
+            System.IO.Directory.CreateDirectory(folder);
+            double pct = (double)_score / _questions.Count * 100;
+            string line = $"QuizResult----------------------{DateTime.Now:yyyy-MM-dd HH:mm:ss} Score:{_score} Percentage:{pct:0}% Correct:{_correctAnswers}\\n";
+            System.IO.File.AppendAllText(path, line);
+        }
+        catch
+        {
+            // non-fatal — ignore file write failures, activity log already records results
+        }
+    }
+
+    private string FormatFinalResults()
+    {
+        int total = _questions.Count;
+        double pct = (double)_score / total * 100;
+        var sb = new StringBuilder();
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━");
+        sb.AppendLine("🏆 Quiz Complete!");
+        sb.AppendLine($"Final Score {_score} / {total}");
+        sb.AppendLine($"Correct {_correctAnswers}");
+        sb.AppendLine($"Incorrect {_wrongAnswers}");
+        sb.AppendLine($"Percentage {pct:0}%");
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━");
+
+        if (pct >= 100)
+            sb.AppendLine("🌟 Outstanding!\nYou're a Cybersecurity Expert.");
+        else if (pct >= 80)
+            sb.AppendLine("🎉 Excellent!\nYou have strong cybersecurity knowledge.");
+        else if (pct >= 60)
+            sb.AppendLine("👍 Good Job!\nYou understand the basics, but keep practising.");
+        else if (pct >= 40)
+            sb.AppendLine("📚 Fair Attempt.\nReview password safety, phishing and privacy.");
+        else
+            sb.AppendLine("💡 Keep Learning.\nTry the quiz again after reviewing the cybersecurity topics.");
+
+        return sb.ToString().TrimEnd();
     }
 
     private static List<QuizQuestion> BuildQuestions()
@@ -235,5 +338,13 @@ public class QuizQuestion
             return CorrectIndex == 0 ? "True" : "False";
 
         return $"{(char)('A' + CorrectIndex)}) {Options[CorrectIndex]}";
+    }
+
+    public string GetCorrectShortLabel()
+    {
+        if (IsTrueFalse)
+            return CorrectIndex == 0 ? "True" : "False";
+
+        return $"{(char)('A' + CorrectIndex)}";
     }
 }
