@@ -14,7 +14,7 @@ public static class ResponseCatalog
 
     /// <summary>Returned when input does not match any known topic.</summary>
     public const string DefaultResponse =
-        "I didn't quite understand that. Could you rephrase?";
+        "I didn't quite understand that. Try asking about phishing, passwords, 2FA, safe browsing, or use chat commands like \"start quiz\", \"view tasks\", or \"show activity log\".";
 
     // -------------------------------------------------------------------------
     // Topic name constants

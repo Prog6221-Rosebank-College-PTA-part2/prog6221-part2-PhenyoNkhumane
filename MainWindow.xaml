@@ -160,40 +160,49 @@
                 BorderBrush="#1e3a5f"
                 BorderThickness="0,1,0,0"
                 Padding="16,10">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBox Grid.Column="0"
-                         x:Name="UserInputBox"
-                         Style="{StaticResource InputBoxStyle}"
-                         Height="52"
-                         Margin="0,0,10,0"
-                         IsEnabled="False"
-                         KeyDown="UserInputBox_KeyDown"
-                         ToolTip="Type your message and press Enter or click Send"/>
+                    <TextBox Grid.Column="0"
+                             x:Name="UserInputBox"
+                             Style="{StaticResource InputBoxStyle}"
+                             Height="52"
+                             Margin="0,0,10,0"
+                             IsEnabled="False"
+                             KeyDown="UserInputBox_KeyDown"
+                             ToolTip="Type your message and press Enter or click Send"/>
 
-                <Button Grid.Column="1"
-                        x:Name="SendButton"
-                        Content="Send"
-                        Style="{StaticResource SendButtonStyle}"
-                        Height="52"
-                        IsEnabled="False"
-                        Margin="0,0,10,0"
-                        Click="SendButton_Click"/>
+                    <Button Grid.Column="1"
+                            x:Name="SendButton"
+                            Content="Send"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="52"
+                            IsEnabled="False"
+                            Margin="0,0,10,0"
+                            Click="SendButton_Click"/>
 
-                <Button Grid.Column="2"
-                        x:Name="ClearButton"
-                        Content="Clear"
-                        Style="{StaticResource SendButtonStyle}"
-                        Height="52"
-                        Background="#37474f"
-                        Foreground="#e0e0e0"
-                        Click="ClearButton_Click"/>
-            </Grid>
+                    <Button Grid.Column="2"
+                            x:Name="ClearButton"
+                            Content="Clear"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="52"
+                            Background="#37474f"
+                            Foreground="#e0e0e0"
+                            Click="ClearButton_Click"/>
+                </Grid>
+
+                <TextBlock Text="Try: start quiz • view tasks • show activity log • ask about phishing, passwords, 2FA"
+                           FontFamily="Consolas"
+                           FontSize="11"
+                           Foreground="#607d8b"
+                           Margin="0,10,0,0"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
         </Border>
 
         <!-- NAME PROMPT OVERLAY -->

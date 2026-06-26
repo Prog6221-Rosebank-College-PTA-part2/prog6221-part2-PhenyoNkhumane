@@ -170,7 +170,11 @@ public class TaskAssistant
         }
     }
 
-    private string HandleViewTasks() => FormatTasksForDisplay();
+    private string HandleViewTasks()
+    {
+        ActivityLog.Log("Viewed tasks.");
+        return FormatTasksForDisplay();
+    }
 
     private string HandleDeleteTask(NlpIntentDetector.IntentResult intent)
     {

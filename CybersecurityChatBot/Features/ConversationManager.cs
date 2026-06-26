@@ -105,11 +105,17 @@ class ConversationManager
         // ── 1. Part 3: tasks, quiz, activity log, NLP intents ───────────────────
         string? part3Response = _part3.TryHandle(rawInput);
         if (part3Response != null)
+        {
+            ActivityLog.Log($"Processed feature command: {rawInput}");
             return part3Response;
+        }
 
         // ── 2. Memory query (explicit: "what do you remember about me?") ──────
         if (IsMemoryQuery(input))
+        {
+            ActivityLog.Log("User asked what the bot remembers.");
             return BuildMemoryReport();
+        }
 
         // ── 3. Interest capture ───────────────────────────────────────────────
         // Must run before follow-up check because "I'm interested in X" also
@@ -124,13 +130,20 @@ class ConversationManager
 
         // ── 4. Follow-up handling ─────────────────────────────────────────────
         if (IsFollowUp(input))
+        {
+            ActivityLog.Log($"Follow-up received for topic: {LastTopic ?? "none"}.");
             return HandleFollowUp();
+        }
 
         // ── 5. Sentiment detection ────────────────────────────────────────────
         // Runs after follow-up so "tell me more" / "explain" never reach here.
-        string? sentimentResponse = SentimentDetector.DetectAndRespond(rawInput, LastTopic);
+        var sentiment = SentimentDetector.Detect(rawInput);
+        string? sentimentResponse = sentiment == SentimentDetector.Sentiment.None
+            ? null
+            : SentimentDetector.BuildResponse(sentiment, LastTopic);
         if (sentimentResponse != null)
         {
+            ActivityLog.Log($"Detected sentiment: {sentiment}.");
             // Append a memory recall line if it's time and we have interests.
             string recall = MaybeGetRecallLine();
             return recall.Length > 0
@@ -143,6 +156,7 @@ class ConversationManager
 
         if (matchedTopic != null)
         {
+            ActivityLog.Log($"Responded on topic: {matchedTopic}.");
             UpdateTopic(matchedTopic);
 
             // Append a recall line if this topic differs from the stored

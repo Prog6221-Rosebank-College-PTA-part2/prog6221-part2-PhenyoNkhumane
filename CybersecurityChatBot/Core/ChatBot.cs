@@ -62,7 +62,7 @@ public class ChatBot
     {
         string welcome = AsciiArt.GetWelcomeMessage(MemoryStore.UserName);
         string dbNote = _conversation.GetPart3Features().GetDatabaseStatusMessage();
-        return $"{welcome}\n📋 {dbNote}";
+        return $"{welcome}\n📋 {dbNote}\n\nType a question about passwords, phishing, 2FA, or use commands like 'start quiz', 'view tasks', or 'show activity log'.";
     }
 
     // -------------------------------------------------------------------------
