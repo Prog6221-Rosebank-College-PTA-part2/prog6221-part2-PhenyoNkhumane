@@ -228,6 +228,77 @@ public static class TaskDatabase
         return conn;
     }
 
+    private static int AddTaskLocal(string title, string description, DateTime? reminderDate)
+    {
+        List<CyberTask> tasks = LoadLocalTasks();
+        int newId = tasks.Count == 0 ? 1 : tasks.Max(t => t.Id) + 1;
+        var task = new CyberTask
+        {
+            Id = newId,
+            Title = title,
+            Description = description,
+            ReminderDate = reminderDate,
+            IsCompleted = false,
+            CreatedAt = DateTime.Now
+        };
+
+        tasks.Insert(0, task);
+        SaveLocalTasks(tasks);
+        return newId;
+    }
+
+    private static List<CyberTask> LoadLocalTasks()
+    {
+        try
+        {
+            if (!File.Exists(LocalFallbackPath))
+                return new List<CyberTask>();
+
+            string json = File.ReadAllText(LocalFallbackPath);
+            var tasks = JsonSerializer.Deserialize<List<CyberTask>>(json);
+            return tasks ?? new List<CyberTask>();
+        }
+        catch
+        {
+            return new List<CyberTask>();
+        }
+    }
+
+    private static void SaveLocalTasks(List<CyberTask> tasks)
+    {
+        try
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(tasks, options);
+            File.WriteAllText(LocalFallbackPath, json);
+        }
+        catch
+        {
+            // If local persistence fails, there is nothing else we can do.
+        }
+    }
+
+    private static bool DeleteTaskLocal(int id)
+    {
+        var tasks = LoadLocalTasks();
+        int removed = tasks.RemoveAll(task => task.Id == id);
+        if (removed > 0)
+            SaveLocalTasks(tasks);
+        return removed > 0;
+    }
+
+    private static bool UpdateLocalTask(int id, Action<CyberTask> update)
+    {
+        var tasks = LoadLocalTasks();
+        CyberTask? task = tasks.FirstOrDefault(t => t.Id == id);
+        if (task == null)
+            return false;
+
+        update(task);
+        SaveLocalTasks(tasks);
+        return true;
+    }
+
     private static string LoadConnectionString()
     {
         string? env = Environment.GetEnvironmentVariable("MAVICKS_DB_CONNECTION");

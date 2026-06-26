@@ -131,9 +131,12 @@ public partial class MainWindow : Window
         TasksListView.ItemsSource = null;
         TasksListView.ItemsSource = _chatBot.GetTasks();
         QuizStatusTextBlock.Text = _chatBot.GetQuizStatusText();
+
         DbStatusTextBlock.Text = TaskDatabase.IsAvailable
             ? "Database: connected ✓"
-            : $"Database: offline — {TaskDatabase.LastError}";
+            : TaskDatabase.IsLocalFallback
+                ? $"Database: offline — using local task store ({TaskDatabase.LastError ?? "no error details"})"
+                : $"Database: offline — {TaskDatabase.LastError}";
     }
 
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)
