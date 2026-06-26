@@ -27,13 +27,13 @@
     {
       "Id": 3,
       "Name": "Vicky",
-      "FavouriteTopic": null,
+      "FavouriteTopic": "pharming",
       "BestQuizScore": 0,
       "QuizAttempts": 0,
       "QuizAverageScore": 0,
       "TotalTasks": 0,
       "CompletedTasks": 0,
-      "LastLogin": "2026-06-26T23:48:40.4955518+02:00",
+      "LastLogin": "2026-06-27T00:33:13.6240526+02:00",
       "CreatedAt": "2026-06-26T23:48:40.4831781+02:00"
     },
     {
@@ -215,6 +215,42 @@
       "UserId": 4,
       "Description": "Processed feature command: Show statistics",
       "Timestamp": "2026-06-27T00:20:38.442147+02:00"
+    },
+    {
+      "Id": 25,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: ShowHelp.",
+      "Timestamp": "2026-06-27T00:28:42.3496271+02:00"
+    },
+    {
+      "Id": 26,
+      "UserId": 3,
+      "Description": "User requested help.",
+      "Timestamp": "2026-06-27T00:28:42.3505472+02:00"
+    },
+    {
+      "Id": 27,
+      "UserId": 3,
+      "Description": "Processed feature command: help",
+      "Timestamp": "2026-06-27T00:28:42.3512606+02:00"
+    },
+    {
+      "Id": 28,
+      "UserId": 3,
+      "Description": "Responded on topic: 2fa.",
+      "Timestamp": "2026-06-27T00:31:52.5219183+02:00"
+    },
+    {
+      "Id": 29,
+      "UserId": 3,
+      "Description": "Responded on topic: password.",
+      "Timestamp": "2026-06-27T00:32:31.664495+02:00"
+    },
+    {
+      "Id": 30,
+      "UserId": 3,
+      "Description": "Responded on topic: pharming.",
+      "Timestamp": "2026-06-27T00:33:13.6191812+02:00"
     }
   ],
   "Settings": []
