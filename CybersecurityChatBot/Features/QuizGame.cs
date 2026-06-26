@@ -17,6 +17,11 @@ public class QuizGame
     private int _wrongAnswers;
     private bool _quizStarted;
     private bool _quizFinished;
+    private readonly Random _rng = new Random();
+    private List<ActiveQuestion> _activeQuestions = new List<ActiveQuestion>();
+    private bool _awaitingQuitConfirmation;
+    private int _bestScore;
+    private string _bestScorePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "database", "best_score.txt");
 
     public bool IsActive => _active;
     public int CurrentQuestionNumber => _active ? _currentIndex + 1 : 0;
@@ -31,6 +36,7 @@ public class QuizGame
     public QuizGame()
     {
         _questions = BuildQuestions();
+        _activeQuestions = new List<ActiveQuestion>(_questions.Count);
     }
 
     public string Start()
@@ -45,6 +51,24 @@ public class QuizGame
         _active = true;
 
         ActivityLog.Log("Quiz Started");
+        // Randomize questions and shuffle choices
+        _activeQuestions.Clear();
+        var shuffled = _questions.OrderBy(q => _rng.Next()).ToList();
+        foreach (var q in shuffled)
+            _activeQuestions.Add(ActiveQuestion.CreateFrom(q, _rng));
+
+        // Load best score if exists
+        try
+        {
+            var dir = System.IO.Path.GetDirectoryName(_bestScorePath) ?? ".";
+            System.IO.Directory.CreateDirectory(dir);
+            if (System.IO.File.Exists(_bestScorePath) && int.TryParse(System.IO.File.ReadAllText(_bestScorePath), out int bs))
+                _bestScore = bs;
+        }
+        catch
+        {
+        }
+
         return FormatCurrentQuestion();
     }
 
@@ -52,51 +76,79 @@ public class QuizGame
     {
         if (!_active)
             return null;
-        // Step 4 & 5 — Wait for input & Validate
-        QuizQuestion question = _questions[_currentIndex];
-        int? parsed = ParseAnswerStrict(rawInput, question);
+        // Handle quit confirmation
+        string trimmed = rawInput?.Trim() ?? string.Empty;
+        if (_awaitingQuitConfirmation)
+        {
+            string up = trimmed.ToUpperInvariant();
+            if (up == "Y" || up == "YES")
+            {
+                _active = false;
+                _quizFinished = true;
+                ActivityLog.Log("Quiz quit by user.");
+                _quizStarted = false;
+                return FormatFinalResults() + "\n\nYou're now back in normal chat mode. You can ask cybersecurity questions, manage tasks, or start another quiz whenever you like.";
+            }
+            else
+            {
+                _awaitingQuitConfirmation = false;
+                return "Quit cancelled.\n\n" + FormatCurrentQuestion();
+            }
+        }
+
+        // Recognize quit command
+        if (!string.IsNullOrEmpty(trimmed) && (string.Equals(trimmed, "quit quiz", StringComparison.OrdinalIgnoreCase) || string.Equals(trimmed, "quit", StringComparison.OrdinalIgnoreCase)))
+        {
+            _awaitingQuitConfirmation = true;
+            return "Are you sure you want to quit the quiz? (Y/N)";
+        }
+
+        // Validate answer against active question
+        if (_currentIndex < 0 || _currentIndex >= _activeQuestions.Count)
+            return string.Empty;
+
+        ActiveQuestion aq = _activeQuestions[_currentIndex];
+        int? parsed = ParseAnswerStrict(trimmed, aq.BaseQuestion);
         if (!parsed.HasValue)
         {
             return "⚠ Invalid answer.\nPlease answer using A, B, C, D, True, or False\n\n" + FormatCurrentQuestion();
         }
 
-        bool correct = parsed.Value == question.CorrectIndex;
+        bool correct = parsed.Value == aq.ShuffledCorrectIndex;
         var sb = new StringBuilder();
 
         if (correct)
         {
-            // Step 6 — If correct
             _score++;
             _correctAnswers++;
             sb.AppendLine("✔ Correct!");
-            sb.AppendLine(question.Explanation);
-            sb.AppendLine($"+1 point");
+            sb.AppendLine(aq.BaseQuestion.Explanation);
+            sb.AppendLine("+1 point");
             ActivityLog.Log($"Question {_currentIndex + 1} Correct");
         }
         else
         {
-            // Step 6 — If wrong
             _wrongAnswers++;
             sb.AppendLine("❌ Incorrect.");
-            sb.AppendLine($"The correct answer is {question.GetCorrectShortLabel()}");
-            sb.AppendLine($"Why? {question.Explanation}");
+            sb.AppendLine($"The correct answer is {aq.BaseQuestion.GetCorrectShortLabel()}");
+            sb.AppendLine($"Why? {aq.BaseQuestion.Explanation}");
             ActivityLog.Log($"Question {_currentIndex + 1} Incorrect");
         }
 
-        // Step 8 — Next question automatically
+        // Encouraging message between questions
+        if (_currentIndex + 1 < _activeQuestions.Count)
+            sb.AppendLine().AppendLine($"Great work! Let's continue to Question {_currentIndex + 2}.");
+
         _currentIndex++;
 
-        if (_currentIndex >= _questions.Count)
+        if (_currentIndex >= _activeQuestions.Count)
         {
             _active = false;
             _quizFinished = true;
-            // Step 10 — Final results
             sb.AppendLine();
             sb.AppendLine(FormatFinalResults());
-            // Step 12 — Save quiz result
             SaveQuizResult();
-            ActivityLog.Log($"Quiz Completed — Score {_score}/{_questions.Count}");
-            // Step 13 — Return to chat mode state
+            ActivityLog.Log($"Quiz Completed — Score {_score}/{_activeQuestions.Count}");
             _quizStarted = false;
             _currentIndex = 0;
             return sb.ToString().TrimEnd() + "\n\nYou're now back in normal chat mode. You can ask cybersecurity questions, manage tasks, or start another quiz whenever you like.";
@@ -109,18 +161,26 @@ public class QuizGame
 
     public string FormatCurrentQuestion()
     {
-        if (!_active || _currentIndex >= _questions.Count)
+        if (!_active || _currentIndex >= _activeQuestions.Count)
             return string.Empty;
 
-        QuizQuestion q = _questions[_currentIndex];
+        ActiveQuestion aq = _activeQuestions[_currentIndex];
+        QuizQuestion q = aq.BaseQuestion;
         var sb = new StringBuilder();
         sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        sb.AppendLine($"Question {_currentIndex + 1} of {_questions.Count}    Current Score {_score}");
+
+        int total = _activeQuestions.Count;
+        int filled = (int)Math.Round((double)(_currentIndex + 1) / total * 10);
+        filled = Math.Max(0, Math.Min(10, filled));
+        string bar = new string('█', filled) + new string('░', 10 - filled);
+        sb.AppendLine($"{bar} {_currentIndex + 1}/{total}");
+        sb.AppendLine($"Category: {q.Category}");
+        sb.AppendLine($"Question {_currentIndex + 1} of {total}    Current Score {_score}");
         sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         sb.AppendLine(q.Question);
 
         char label = 'A';
-        foreach (string option in q.Options)
+        foreach (string option in aq.ShuffledOptions)
         {
             sb.AppendLine($"{label}) {option}");
             label++;
@@ -195,13 +255,50 @@ public class QuizGame
             string folder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "database");
             string path = System.IO.Path.Combine(folder, "quiz_results.txt");
             System.IO.Directory.CreateDirectory(folder);
-            double pct = (double)_score / _questions.Count * 100;
-            string line = $"QuizResult----------------------{DateTime.Now:yyyy-MM-dd HH:mm:ss} Score:{_score} Percentage:{pct:0}% Correct:{_correctAnswers}\\n";
+            int total = _activeQuestions != null && _activeQuestions.Count > 0 ? _activeQuestions.Count : _questions.Count;
+            double pct = (double)_score / total * 100;
+            string line = $"QuizResult----------------------{DateTime.Now:yyyy-MM-dd HH:mm:ss} Score:{_score} Percentage:{pct:0}% Correct:{_correctAnswers}\n";
             System.IO.File.AppendAllText(path, line);
+
+            // update best score if beaten
+            try
+            {
+                if (_score > _bestScore)
+                {
+                    System.IO.File.WriteAllText(_bestScorePath, _score.ToString());
+                    _bestScore = _score;
+                    ActivityLog.Log($"New best quiz score: {_bestScore}");
+                }
+            }
+            catch
+            {
+            }
         }
         catch
         {
             // non-fatal — ignore file write failures, activity log already records results
+        }
+    }
+
+    private record ActiveQuestion(QuizQuestion BaseQuestion, List<string> ShuffledOptions, int ShuffledCorrectIndex)
+    {
+        public static ActiveQuestion CreateFrom(QuizQuestion q, Random rng)
+        {
+            var opts = q.Options.ToList();
+            // shuffle options
+            for (int i = opts.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                var tmp = opts[i];
+                opts[i] = opts[j];
+                opts[j] = tmp;
+            }
+
+            // find new index of correct answer
+            string correct = q.Options[q.CorrectIndex];
+            int newIndex = opts.IndexOf(correct);
+
+            return new ActiveQuestion(q, opts, newIndex);
         }
     }
 
@@ -240,77 +337,89 @@ public class QuizGame
                 "What should you do if you receive an email asking for your password?",
                 new[] { "Reply with your password", "Delete the email", "Report the email as phishing", "Ignore it" },
                 2,
-                "Reporting phishing emails helps prevent scams and protects others."),
+                "Reporting phishing emails helps prevent scams and protects others.",
+                category: "Phishing"),
 
             new QuizQuestion(
                 "True or False: Using the same password for every account is safe if it is very long.",
                 new[] { "True", "False" },
                 1,
                 "Reusing passwords means one breach can compromise all your accounts. Use unique passwords.",
-                isTrueFalse: true),
+                isTrueFalse: true,
+                category: "Passwords"),
 
             new QuizQuestion(
                 "Which is the strongest password?",
                 new[] { "Password123", "P@ssw0rd!", "Xk9#mL2$vQ7!", "yourname2024" },
                 2,
-                "Strong passwords are long, random, and include mixed character types."),
+                "Strong passwords are long, random, and include mixed character types.",
+                category: "Passwords"),
 
             new QuizQuestion(
                 "What is two-factor authentication (2FA)?",
                 new[] { "Two passwords", "A second verification step after your password", "Logging in twice", "Using two email addresses" },
                 1,
-                "2FA adds a second layer of security, such as a code from an authenticator app."),
+                "2FA adds a second layer of security, such as a code from an authenticator app.",
+                category: "Authentication"),
 
             new QuizQuestion(
                 "True or False: Public Wi-Fi is always safe for online banking.",
                 new[] { "True", "False" },
                 1,
                 "Public Wi-Fi can be intercepted. Avoid sensitive transactions or use a trusted VPN.",
-                isTrueFalse: true),
+                isTrueFalse: true,
+                category: "Privacy"),
 
             new QuizQuestion(
                 "What is phishing?",
                 new[] { "A type of malware", "Tricking users into revealing sensitive information", "Encrypting your files", "A firewall feature" },
                 1,
-                "Phishing uses fake messages or websites to steal credentials or personal data."),
+                "Phishing uses fake messages or websites to steal credentials or personal data.",
+                category: "Phishing"),
 
             new QuizQuestion(
                 "You get a USB drive labelled 'Confidential' in the parking lot. What should you do?",
                 new[] { "Plug it in to see what's on it", "Turn it in to IT/security", "Share it with colleagues", "Take it home" },
                 1,
-                "Unknown USB devices can install malware. Never plug them into your computer."),
+                "Unknown USB devices can install malware. Never plug them into your computer.",
+                category: "Malware"),
 
             new QuizQuestion(
                 "True or False: Software updates often include important security patches.",
                 new[] { "True", "False" },
                 0,
                 "Updates fix known vulnerabilities. Keeping software current is essential.",
-                isTrueFalse: true),
+                isTrueFalse: true,
+                category: "Updates"),
 
             new QuizQuestion(
                 "What is social engineering?",
                 new[] { "Building social media apps", "Manipulating people to bypass security", "Engineering secure networks", "Creating strong passwords" },
                 1,
-                "Social engineering exploits human trust rather than technical flaws."),
+                "Social engineering exploits human trust rather than technical flaws.",
+                category: "Social Engineering"),
 
             new QuizQuestion(
                 "Which link is safest to click in an unexpected email?",
                 new[] { "A shortened URL from an unknown sender", "A link that matches the official domain you know", "Any link in a urgent message", "A link asking you to 'verify your account'" },
                 1,
-                "Always verify URLs and sender identity before clicking links in emails."),
+                "Always verify URLs and sender identity before clicking links in emails.",
+                category: "Phishing"),
 
             new QuizQuestion(
                 "What does HTTPS in a browser address bar indicate?",
                 new[] { "The site is always trustworthy", "The connection to the site is encrypted", "The site is free of malware", "Your password is stored on the site" },
                 1,
-                "HTTPS encrypts data in transit, but you should still verify the site is legitimate."),
+                "HTTPS encrypts data in transit, but you should still verify the site is legitimate.",
+                category: "Privacy"),
 
             new QuizQuestion(
                 "True or False: Antivirus software alone guarantees you will never be hacked.",
                 new[] { "True", "False" },
                 1,
                 "Security requires layered defences: updates, strong passwords, awareness, and backups.",
-                isTrueFalse: true),
+                isTrueFalse: true,
+                category: "Security"),
         };
     }
 }
@@ -322,14 +431,16 @@ public class QuizQuestion
     public int CorrectIndex { get; }
     public string Explanation { get; }
     public bool IsTrueFalse { get; }
+    public string Category { get; }
 
-    public QuizQuestion(string question, string[] options, int correctIndex, string explanation, bool isTrueFalse = false)
+    public QuizQuestion(string question, string[] options, int correctIndex, string explanation, bool isTrueFalse = false, string category = "General")
     {
         Question = question;
         Options = options;
         CorrectIndex = correctIndex;
         Explanation = explanation;
         IsTrueFalse = isTrueFalse;
+        Category = category;
     }
 
     public string GetCorrectLabel()
