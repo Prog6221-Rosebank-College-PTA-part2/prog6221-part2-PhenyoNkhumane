@@ -24,3 +24,5 @@ C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\re
 C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.pdb
 C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\prog6221-part2-PhenyoNkhumane.genruntimeconfig.cache
 C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\ref\prog6221-part2-PhenyoNkhumane.dll
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\Themes\ModernStyles.baml
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\obj\Debug\net10.0-windows\App.baml
