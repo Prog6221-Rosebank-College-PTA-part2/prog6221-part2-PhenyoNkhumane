@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "prog6221-part2-phenyoNkhumane/1.0.0": {
+      "prog6221-part2-PhenyoNkhumane/1.0.0": {
         "dependencies": {
           "MySqlConnector": "2.4.0"
         },
         "runtime": {
-          "prog6221-part2-phenyoNkhumane.dll": {}
+          "prog6221-part2-PhenyoNkhumane.dll": {}
         }
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2": {
@@ -48,7 +48,7 @@
     }
   },
   "libraries": {
-    "prog6221-part2-phenyoNkhumane/1.0.0": {
+    "prog6221-part2-PhenyoNkhumane/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
