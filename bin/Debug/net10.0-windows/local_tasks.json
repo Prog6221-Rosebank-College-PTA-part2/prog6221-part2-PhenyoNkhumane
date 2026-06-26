@@ -1,22 +1,179 @@
-[
-  {
-    "Id": 2,
-    "Title": "s:",
-    "Description": "Complete this cybersecurity task: s:.",
-    "ReminderDate": null,
-    "IsCompleted": false,
-    "CreatedAt": "2026-06-26T11:39:44.3760483+02:00",
-    "ReminderDisplay": "No reminder set",
-    "StatusDisplay": "Pending"
-  },
-  {
-    "Id": 1,
-    "Title": "change password",
-    "Description": "Update your password using a strong, unique passphrase and a password manager.",
-    "ReminderDate": "2026-06-28T11:39:28.8420639+02:00",
-    "IsCompleted": false,
-    "CreatedAt": "2026-06-26T11:38:44.4756933+02:00",
-    "ReminderDisplay": "28 Jun 2026 11:39",
-    "StatusDisplay": "Pending"
-  }
-]
+{
+  "Users": [
+    {
+      "Id": 1,
+      "Name": "Guest",
+      "FavouriteTopic": null,
+      "BestQuizScore": 0,
+      "QuizAttempts": 0,
+      "QuizAverageScore": 0,
+      "TotalTasks": 0,
+      "CompletedTasks": 0,
+      "LastLogin": "2026-06-26T22:43:02.1053654+02:00",
+      "CreatedAt": "2026-06-26T22:43:02.1026254+02:00"
+    },
+    {
+      "Id": 2,
+      "Name": "Phenyo",
+      "FavouriteTopic": null,
+      "BestQuizScore": 0,
+      "QuizAttempts": 0,
+      "QuizAverageScore": 0,
+      "TotalTasks": 0,
+      "CompletedTasks": 0,
+      "LastLogin": "2026-06-26T22:43:30.5550527+02:00",
+      "CreatedAt": "2026-06-26T22:43:30.5422108+02:00"
+    }
+  ],
+  "Tasks": [
+    {
+      "Id": 1,
+      "UserId": 2,
+      "Title": "Enable two-factor authentication",
+      "Description": "Enable two-factor authentication to add an extra layer of account security.",
+      "ReminderDate": "2026-06-28T22:46:00.2259925+02:00",
+      "DueDate": null,
+      "IsCompleted": false,
+      "CreatedAt": "2026-06-26T22:44:32.9905965+02:00"
+    },
+    {
+      "Id": 2,
+      "UserId": 2,
+      "Title": "bowling",
+      "Description": "Complete this cybersecurity task: bowling.",
+      "ReminderDate": null,
+      "DueDate": null,
+      "IsCompleted": false,
+      "CreatedAt": "2026-06-26T22:46:23.4768921+02:00"
+    }
+  ],
+  "Activities": [
+    {
+      "Id": 1,
+      "UserId": 2,
+      "Description": "Recognised NLP intent: ViewTasks.",
+      "Timestamp": "2026-06-26T22:44:02.1339112+02:00"
+    },
+    {
+      "Id": 2,
+      "UserId": 2,
+      "Description": "Processed feature command: View tasks",
+      "Timestamp": "2026-06-26T22:44:02.1450896+02:00"
+    },
+    {
+      "Id": 3,
+      "UserId": 2,
+      "Description": "Recognised NLP intent: AddTask.",
+      "Timestamp": "2026-06-26T22:44:32.9856133+02:00"
+    },
+    {
+      "Id": 4,
+      "UserId": 2,
+      "Description": "Task added: \u0027Enable two-factor authentication\u0027 (no reminder set yet).",
+      "Timestamp": "2026-06-26T22:44:32.9958283+02:00"
+    },
+    {
+      "Id": 5,
+      "UserId": 2,
+      "Description": "Processed feature command: Add task - Enable two-factor authentication",
+      "Timestamp": "2026-06-26T22:44:32.9972541+02:00"
+    },
+    {
+      "Id": 6,
+      "UserId": 2,
+      "Description": "Processed feature command: Yes",
+      "Timestamp": "2026-06-26T22:44:44.4917785+02:00"
+    },
+    {
+      "Id": 7,
+      "UserId": 2,
+      "Description": "Processed feature command: 2 hours",
+      "Timestamp": "2026-06-26T22:44:53.5010231+02:00"
+    },
+    {
+      "Id": 8,
+      "UserId": 2,
+      "Description": "Processed feature command: yes",
+      "Timestamp": "2026-06-26T22:45:04.1911131+02:00"
+    },
+    {
+      "Id": 9,
+      "UserId": 2,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-26T22:45:35.1209714+02:00"
+    },
+    {
+      "Id": 10,
+      "UserId": 2,
+      "Description": "Processed feature command: Tell me about password safety",
+      "Timestamp": "2026-06-26T22:45:50.2469058+02:00"
+    },
+    {
+      "Id": 11,
+      "UserId": 2,
+      "Description": "Reminder set for \u0027Enable two-factor authentication\u0027 on 28 Jun 2026.",
+      "Timestamp": "2026-06-26T22:46:00.2299719+02:00"
+    },
+    {
+      "Id": 12,
+      "UserId": 2,
+      "Description": "Processed feature command: yes in 2 days",
+      "Timestamp": "2026-06-26T22:46:00.2321793+02:00"
+    },
+    {
+      "Id": 13,
+      "UserId": 2,
+      "Description": "Recognised NLP intent: AddTask.",
+      "Timestamp": "2026-06-26T22:46:23.462159+02:00"
+    },
+    {
+      "Id": 14,
+      "UserId": 2,
+      "Description": "Task added: \u0027bowling\u0027 (no reminder set yet).",
+      "Timestamp": "2026-06-26T22:46:23.477933+02:00"
+    },
+    {
+      "Id": 15,
+      "UserId": 2,
+      "Description": "Processed feature command: add task bowling",
+      "Timestamp": "2026-06-26T22:46:23.4789984+02:00"
+    },
+    {
+      "Id": 16,
+      "UserId": 2,
+      "Description": "Processed feature command: no",
+      "Timestamp": "2026-06-26T22:46:34.956759+02:00"
+    },
+    {
+      "Id": 17,
+      "UserId": 2,
+      "Description": "Recognised NLP intent: StartQuiz.",
+      "Timestamp": "2026-06-26T22:47:47.1414206+02:00"
+    },
+    {
+      "Id": 18,
+      "UserId": 2,
+      "Description": "Quiz Started",
+      "Timestamp": "2026-06-26T22:47:47.1533465+02:00"
+    },
+    {
+      "Id": 19,
+      "UserId": 2,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-26T22:47:47.1609086+02:00"
+    },
+    {
+      "Id": 20,
+      "UserId": 2,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-26T22:47:51.9643222+02:00"
+    },
+    {
+      "Id": 21,
+      "UserId": 2,
+      "Description": "Processed feature command: Help",
+      "Timestamp": "2026-06-26T22:48:02.589754+02:00"
+    }
+  ],
+  "Settings": []
+}
