@@ -452,7 +452,7 @@
                                 Foreground="#ffffff"
                                 Click="DeleteTaskButton_Click"/>
                     </StackPanel>
-                </StackPanel>
+                
 
                 <TextBlock Grid.Row="3"
                            x:Name="QuizStatusTextBlock"

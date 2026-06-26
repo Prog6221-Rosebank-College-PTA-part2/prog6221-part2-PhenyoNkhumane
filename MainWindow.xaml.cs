@@ -258,6 +258,23 @@ public partial class MainWindow : Window
         }
     }
 
+    private void EditTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TasksListView.SelectedItem is CyberTask task)
+        {
+            // Trigger edit flow via chat bot; UI could be enhanced to open an editor.
+            string command = $"edit task {task.Id}";
+            AppendUserMessage(command);
+            var response = _chatBot.ProcessMessage(command);
+            AppendBotMessage(response.Message, isWarning: response.IsWarning);
+            RefreshSidebar();
+        }
+        else
+        {
+            AppendBotMessage("Select a task from the list first, then click Edit.", isWarning: true);
+        }
+    }
+
     private void AppendUserMessage(string text)
     {
         string label = $"{_chatBot.GetUserName()} >";
