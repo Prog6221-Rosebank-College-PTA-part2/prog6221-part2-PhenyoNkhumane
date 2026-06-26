@@ -186,13 +186,30 @@ public partial class MainWindow : Window
 
     private void RefreshSidebar()
     {
-        TasksDataGrid.ItemsSource = null;
-        TasksDataGrid.ItemsSource = _chatBot.GetTasks();
-        QuizStatusTextBlock.Text = _chatBot.GetQuizStatusText();
+        try
+        {
+            if (TasksDataGrid != null)
+            {
+                TasksDataGrid.ItemsSource = null;
+                TasksDataGrid.ItemsSource = _chatBot.GetTasks();
+            }
 
-        DbStatusTextBlock.Text = TaskDatabase.IsAvailable
-            ? "Database: connected ✓"
-            : $"Database: offline — {TaskDatabase.LastError ?? "unknown error"}";
+            if (QuizStatusTextBlock != null)
+            {
+                QuizStatusTextBlock.Text = _chatBot.GetQuizStatusText();
+            }
+
+            if (DbStatusTextBlock != null)
+            {
+                DbStatusTextBlock.Text = TaskDatabase.IsAvailable
+                    ? "Database: connected ✓"
+                    : $"Database: offline — {TaskDatabase.LastError ?? "unknown error"}";
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"RefreshSidebar failed: {ex.Message}");
+        }
     }
 
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)
