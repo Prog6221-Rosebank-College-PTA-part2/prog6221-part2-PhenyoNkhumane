@@ -77,7 +77,7 @@ public class TaskAssistant
 
         try
         {
-            int id = TaskDatabase.AddTask(title, description, null);
+            int id = TaskDatabase.AddTask(title, description, null, null);
             _pendingTaskId = id;
             _pendingTaskTitle = title;
             _pendingState = PendingState.AwaitingReminderChoice;
@@ -105,7 +105,7 @@ public class TaskAssistant
         {
             try
             {
-                int id = TaskDatabase.AddTask(title, description, null);
+                int id = TaskDatabase.AddTask(title, description, null, null);
                 _pendingTaskId = id;
                 _pendingTaskTitle = title;
                 _pendingState = PendingState.AwaitingReminderChoice;
@@ -120,7 +120,7 @@ public class TaskAssistant
 
         try
         {
-            int id = TaskDatabase.AddTask(title, description, reminderDate);
+            int id = TaskDatabase.AddTask(title, description, reminderDate, null);
             ActivityLog.Log($"Reminder set for '{title}' on {reminderDate.Value:dd MMM yyyy}.");
             return $"Reminder set for '{title}' on {FormatFriendlyDate(reminderDate.Value)}.";
         }

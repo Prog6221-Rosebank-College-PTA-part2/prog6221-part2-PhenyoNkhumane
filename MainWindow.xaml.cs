@@ -105,6 +105,18 @@ public partial class MainWindow : Window
     private void StartQuizButton_Click(object sender, RoutedEventArgs e) =>
         RunQuickCommand("Start quiz");
 
+    private void RestartQuizButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_chatBot.SessionStarted)
+            return;
+
+        AppendUserMessage("Start quiz");
+        ChatBotResponse result = _chatBot.ProcessQuickCommand("Start quiz");
+        AppendBotMessage(result.Message, isWarning: result.IsWarning);
+        RefreshSidebar();
+        UserInputBox.Focus();
+    }
+
     private void ViewTasksButton_Click(object sender, RoutedEventArgs e) =>
         RunQuickCommand("View tasks");
 
@@ -113,6 +125,52 @@ public partial class MainWindow : Window
 
     private void RefreshTasksButton_Click(object sender, RoutedEventArgs e) =>
         RefreshSidebar();
+
+    private void TaskSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        RefreshSidebar();
+    }
+
+    private void TaskFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        RefreshSidebar();
+    }
+
+    private void TaskSortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        RefreshSidebar();
+    }
+
+    private void ExportTasksButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var tasks = _chatBot.GetTasks();
+            if (tasks.Count == 0)
+            {
+                AppendBotMessage("There are no tasks to export.", isWarning: true);
+                return;
+            }
+
+            string fileName = $"MavicksTasks_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
+
+            var lines = new List<string> { "Id,Title,Description,Status,Reminder,Due,CreatedAt" };
+            foreach (var task in tasks)
+            {
+                string safeTitle       = task.Title.Replace(",", " ").Replace("\n", " ");
+                string safeDescription = task.Description.Replace(",", " ").Replace("\n", " ");
+                lines.Add($"{task.Id},\"{safeTitle}\",\"{safeDescription}\",{task.StatusDisplay},\"{task.ReminderDisplay}\",\"{task.DueDisplay}\",{task.CreatedAt:yyyy-MM-dd HH:mm}");
+            }
+
+            System.IO.File.WriteAllLines(path, lines);
+            AppendBotMessage($"Tasks exported to your desktop as {fileName}.");
+        }
+        catch (Exception ex)
+        {
+            AppendBotMessage($"Could not export tasks: {ex.Message}", isWarning: true);
+        }
+    }
 
     private void RunQuickCommand(string command)
     {
@@ -134,9 +192,7 @@ public partial class MainWindow : Window
 
         DbStatusTextBlock.Text = TaskDatabase.IsAvailable
             ? "Database: connected ✓"
-            : TaskDatabase.IsLocalFallback
-                ? $"Database: offline — using local task store ({TaskDatabase.LastError ?? "no error details"})"
-                : $"Database: offline — {TaskDatabase.LastError}";
+            : $"Database: offline — {TaskDatabase.LastError ?? "unknown error"}";
     }
 
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)

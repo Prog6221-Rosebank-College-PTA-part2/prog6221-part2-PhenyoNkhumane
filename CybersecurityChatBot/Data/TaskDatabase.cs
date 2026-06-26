@@ -1,27 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text.Json;
 using MySqlConnector;
 
 /// <summary>
-/// Persistence layer for cybersecurity tasks.
-/// Uses MySQL when available; falls back to a local JSON file when the database is not accessible.
+/// MySQL persistence layer for users, tasks, quiz scores, and activity logs.
 /// </summary>
 public static class TaskDatabase
 {
     private static string? _connectionString;
     private static bool _initialized;
     private static string? _lastError;
-
-    private const string LocalFallbackFileName = "local_tasks.json";
+    private static int _currentUserId;
 
     public static bool IsAvailable { get; private set; }
-    public static bool IsLocalFallback => !_initialized || !IsAvailable;
     public static string? LastError => _lastError;
-
-    private static string LocalFallbackPath => Path.Combine(AppContext.BaseDirectory, LocalFallbackFileName);
+    public static int CurrentUserId => _currentUserId;
 
     public static void Initialize()
     {
@@ -42,171 +37,385 @@ public static class TaskDatabase
             IsAvailable = false;
             _lastError = ex.Message;
         }
+    }
 
+    public static int AddOrGetUser(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name cannot be empty.", nameof(name));
+
+        EnsureReady();
         if (!IsAvailable)
-        {
-            // Ensure a local fallback store exists so the app can continue.
-            SaveLocalTasks(new List<CyberTask>());
-        }
+            return 0;
+
+        using var conn = OpenConnection();
+        using var insertCmd = conn.CreateCommand();
+        insertCmd.CommandText = @"
+            INSERT IGNORE INTO users (name)
+            VALUES (@name);";
+        insertCmd.Parameters.AddWithValue("@name", name.Trim());
+        insertCmd.ExecuteNonQuery();
+
+        using var selectCmd = conn.CreateCommand();
+        selectCmd.CommandText = @"
+            SELECT id FROM users WHERE name = @name LIMIT 1;";
+        selectCmd.Parameters.AddWithValue("@name", name.Trim());
+
+        object result = selectCmd.ExecuteScalar() ?? 0;
+        _currentUserId = Convert.ToInt32(result);
+        return _currentUserId;
     }
 
-    public static int AddTask(string title, string description, DateTime? reminderDate)
+    public static int AddTask(string title, string description, DateTime? reminderDate, DateTime? dueDate)
     {
         EnsureReady();
+        if (!IsAvailable)
+            throw new InvalidOperationException("Task database is not available.");
 
-        if (IsAvailable)
-        {
-            using var conn = OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = """
-                INSERT INTO tasks (title, description, reminder_date, is_completed)
-                VALUES (@title, @description, @reminderDate, 0);
-                SELECT LAST_INSERT_ID();
-                """;
-            cmd.Parameters.AddWithValue("@title", title);
-            cmd.Parameters.AddWithValue("@description", description);
-            cmd.Parameters.AddWithValue("@reminderDate", reminderDate.HasValue ? reminderDate.Value : DBNull.Value);
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO tasks (user_id, title, description, reminder_date, due_date, is_completed)
+            VALUES (@userId, @title, @description, @reminderDate, @dueDate, 0);
+            SELECT LAST_INSERT_ID();";
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+        cmd.Parameters.AddWithValue("@title", title.Trim());
+        cmd.Parameters.AddWithValue("@description", description.Trim());
+        cmd.Parameters.AddWithValue("@reminderDate", reminderDate.HasValue ? reminderDate.Value : DBNull.Value);
+        cmd.Parameters.AddWithValue("@dueDate", dueDate.HasValue ? dueDate.Value : DBNull.Value);
 
-            return Convert.ToInt32(cmd.ExecuteScalar());
-        }
-
-        return AddTaskLocal(title, description, reminderDate);
+        return Convert.ToInt32(cmd.ExecuteScalar());
     }
 
-    public static List<CyberTask> GetAllTasks()
+    public static bool TaskExists(string title)
     {
         EnsureReady();
+        if (!IsAvailable)
+            return false;
 
-        if (IsAvailable)
-        {
-            var tasks = new List<CyberTask>();
-            using var conn = OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = """
-                SELECT id, title, description, reminder_date, is_completed, created_at
-                FROM tasks
-                ORDER BY is_completed ASC, created_at DESC;
-                """;
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT COUNT(*) FROM tasks
+            WHERE user_id = @userId AND title = @title LIMIT 1;";
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+        cmd.Parameters.AddWithValue("@title", title.Trim());
 
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                tasks.Add(new CyberTask
-                {
-                    Id = reader.GetInt32("id"),
-                    Title = reader.GetString("title"),
-                    Description = reader.GetString("description"),
-                    ReminderDate = reader.IsDBNull(reader.GetOrdinal("reminder_date"))
-                        ? null
-                        : reader.GetDateTime("reminder_date"),
-                    IsCompleted = reader.GetBoolean("is_completed"),
-                    CreatedAt = reader.GetDateTime("created_at")
-                });
-            }
+        return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+    }
 
+    public static List<CyberTask> GetAllTasks(string? search = null, bool? completedFilter = null, string? sortColumn = null, bool ascending = true)
+    {
+        EnsureReady();
+        var tasks = new List<CyberTask>();
+        if (!IsAvailable)
             return tasks;
-        }
 
-        return LoadLocalTasks();
-    }
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
 
-    public static bool DeleteTask(int id)
-    {
-        EnsureReady();
+        var whereClauses = new List<string> { "user_id = @userId" };
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
 
-        if (IsAvailable)
+        if (!string.IsNullOrWhiteSpace(search))
         {
-            using var conn = OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE FROM tasks WHERE id = @id;";
-            cmd.Parameters.AddWithValue("@id", id);
-            return cmd.ExecuteNonQuery() > 0;
+            whereClauses.Add("(title LIKE @search OR description LIKE @search)");
+            cmd.Parameters.AddWithValue("@search", $"%{search.Trim()}%");
         }
 
-        return DeleteTaskLocal(id);
-    }
-
-    public static bool MarkCompleted(int id)
-    {
-        EnsureReady();
-
-        if (IsAvailable)
+        if (completedFilter.HasValue)
         {
-            using var conn = OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = "UPDATE tasks SET is_completed = 1 WHERE id = @id;";
-            cmd.Parameters.AddWithValue("@id", id);
-            return cmd.ExecuteNonQuery() > 0;
+            whereClauses.Add("is_completed = @completed");
+            cmd.Parameters.AddWithValue("@completed", completedFilter.Value ? 1 : 0);
         }
 
-        return UpdateLocalTask(id, task => task.IsCompleted = true);
-    }
-
-    public static bool SetReminder(int id, DateTime reminderDate)
-    {
-        EnsureReady();
-
-        if (IsAvailable)
+        string orderBy = sortColumn switch
         {
-            using var conn = OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = "UPDATE tasks SET reminder_date = @date WHERE id = @id;";
-            cmd.Parameters.AddWithValue("@date", reminderDate);
-            cmd.Parameters.AddWithValue("@id", id);
-            return cmd.ExecuteNonQuery() > 0;
+            "due_date" => "due_date",
+            "title" => "title",
+            _ => "created_at"
+        };
+
+        string sortDirection = ascending ? "ASC" : "DESC";
+        cmd.CommandText = $@"
+            SELECT id, title, description, reminder_date, due_date, is_completed, created_at
+            FROM tasks
+            WHERE {string.Join(" AND ", whereClauses)}
+            ORDER BY {orderBy} {sortDirection};";
+
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            tasks.Add(new CyberTask
+            {
+                Id = reader.GetInt32("id"),
+                Title = reader.GetString("title"),
+                Description = reader.GetString("description"),
+                ReminderDate = reader.IsDBNull(reader.GetOrdinal("reminder_date")) ? null : reader.GetDateTime("reminder_date"),
+                DueDate = reader.IsDBNull(reader.GetOrdinal("due_date")) ? null : reader.GetDateTime("due_date"),
+                IsCompleted = reader.GetBoolean("is_completed"),
+                CreatedAt = reader.GetDateTime("created_at")
+            });
         }
 
-        return UpdateLocalTask(id, task => task.ReminderDate = reminderDate);
+        return tasks;
     }
 
     public static CyberTask? GetTaskById(int id)
     {
         EnsureReady();
+        if (!IsAvailable)
+            return null;
 
-        if (IsAvailable)
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT id, title, description, reminder_date, due_date, is_completed, created_at
+            FROM tasks
+            WHERE id = @id AND user_id = @userId
+            LIMIT 1;";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read())
+            return null;
+
+        return new CyberTask
         {
-            using var conn = OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = """
-                SELECT id, title, description, reminder_date, is_completed, created_at
-                FROM tasks WHERE id = @id LIMIT 1;
-                """;
-            cmd.Parameters.AddWithValue("@id", id);
+            Id = reader.GetInt32("id"),
+            Title = reader.GetString("title"),
+            Description = reader.GetString("description"),
+            ReminderDate = reader.IsDBNull(reader.GetOrdinal("reminder_date")) ? null : reader.GetDateTime("reminder_date"),
+            DueDate = reader.IsDBNull(reader.GetOrdinal("due_date")) ? null : reader.GetDateTime("due_date"),
+            IsCompleted = reader.GetBoolean("is_completed"),
+            CreatedAt = reader.GetDateTime("created_at")
+        };
+    }
 
-            using var reader = cmd.ExecuteReader();
-            if (!reader.Read())
-                return null;
+    public static bool EditTask(int id, string? title, string? description, DateTime? reminderDate, DateTime? dueDate)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return false;
 
-            return new CyberTask
-            {
-                Id = reader.GetInt32("id"),
-                Title = reader.GetString("title"),
-                Description = reader.GetString("description"),
-                ReminderDate = reader.IsDBNull(reader.GetOrdinal("reminder_date"))
-                    ? null
-                    : reader.GetDateTime("reminder_date"),
-                IsCompleted = reader.GetBoolean("is_completed"),
-                CreatedAt = reader.GetDateTime("created_at")
-            };
+        if (title == null && description == null && reminderDate == null && dueDate == null)
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+
+        var assignments = new List<string>();
+        if (title != null)
+        {
+            assignments.Add("title = @title");
+            cmd.Parameters.AddWithValue("@title", title.Trim());
         }
 
-        return LoadLocalTasks().FirstOrDefault(task => task.Id == id);
+        if (description != null)
+        {
+            assignments.Add("description = @description");
+            cmd.Parameters.AddWithValue("@description", description.Trim());
+        }
+
+        if (reminderDate != null)
+        {
+            assignments.Add("reminder_date = @reminderDate");
+            cmd.Parameters.AddWithValue("@reminderDate", reminderDate.Value);
+        }
+
+        if (dueDate != null)
+        {
+            assignments.Add("due_date = @dueDate");
+            cmd.Parameters.AddWithValue("@dueDate", dueDate.Value);
+        }
+
+        cmd.CommandText = $@"
+            UPDATE tasks SET {string.Join(", ", assignments)}
+            WHERE id = @id AND user_id = @userId;";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public static bool DeleteTask(int id)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            DELETE FROM tasks
+            WHERE id = @id AND user_id = @userId;";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public static bool MarkCompleted(int id)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            UPDATE tasks SET is_completed = 1
+            WHERE id = @id AND user_id = @userId;";
+        cmd.Parameters.AddWithValue("@id", id);
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public static bool SetReminder(int id, DateTime reminderDate)
+    {
+        return EditTask(id, null, null, reminderDate, null);
+    }
+
+    public static bool SetDueDate(int id, DateTime dueDate)
+    {
+        return EditTask(id, null, null, null, dueDate);
+    }
+
+    public static bool LogActivity(string description)
+    {
+        EnsureReady();
+        if (!IsAvailable || _currentUserId == 0)
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO activity_logs (user_id, description)
+            VALUES (@userId, @description);";
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+        cmd.Parameters.AddWithValue("@description", description.Trim());
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public static List<ActivityEntry> GetRecentActivities(int count = 12)
+    {
+        EnsureReady();
+        var entries = new List<ActivityEntry>();
+        if (!IsAvailable || _currentUserId == 0)
+            return entries;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT timestamp, description
+            FROM activity_logs
+            WHERE user_id = @userId
+            ORDER BY timestamp DESC
+            LIMIT @count;";
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+        cmd.Parameters.AddWithValue("@count", count);
+
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            entries.Add(new ActivityEntry(
+                reader.GetDateTime("timestamp"),
+                reader.GetString("description")));
+        }
+
+        return entries;
+    }
+
+    public static int RecordQuizScore(string userName, int score, int totalQuestions)
+    {
+        if (string.IsNullOrWhiteSpace(userName))
+            userName = "Guest";
+
+        EnsureReady();
+        if (!IsAvailable)
+            return 0;
+
+        int userId = AddOrGetUser(userName);
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO quiz_scores (user_id, score, total_questions)
+            VALUES (@userId, @score, @totalQuestions);";
+        cmd.Parameters.AddWithValue("@userId", userId);
+        cmd.Parameters.AddWithValue("@score", score);
+        cmd.Parameters.AddWithValue("@totalQuestions", totalQuestions);
+
+        cmd.ExecuteNonQuery();
+        return score;
+    }
+
+    public static int GetHighScore()
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return 0;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT MAX(score) FROM quiz_scores
+            WHERE user_id = @userId;";
+        cmd.Parameters.AddWithValue("@userId", _currentUserId);
+
+        object result = cmd.ExecuteScalar() ?? 0;
+        return Convert.ToInt32(result);
     }
 
     private static void EnsureSchema()
     {
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = """
+
+        cmd.CommandText = @"
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL UNIQUE,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );";
+        cmd.ExecuteNonQuery();
+
+        cmd.CommandText = @"
             CREATE TABLE IF NOT EXISTS tasks (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
                 title VARCHAR(255) NOT NULL,
                 description TEXT NOT NULL,
                 reminder_date DATETIME NULL,
+                due_date DATETIME NULL,
                 is_completed TINYINT(1) NOT NULL DEFAULT 0,
-                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-            """;
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );";
+        cmd.ExecuteNonQuery();
+
+        cmd.CommandText = @"
+            CREATE TABLE IF NOT EXISTS quiz_scores (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                score INT NOT NULL,
+                total_questions INT NOT NULL,
+                taken_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );";
+        cmd.ExecuteNonQuery();
+
+        cmd.CommandText = @"
+            CREATE TABLE IF NOT EXISTS activity_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                description TEXT NOT NULL,
+                timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );";
         cmd.ExecuteNonQuery();
     }
 
@@ -215,8 +424,6 @@ public static class TaskDatabase
         if (!_initialized)
             Initialize();
 
-        // Allow operations to continue with the local fallback when the
-        // database is unavailable.
         if (!IsAvailable)
             return;
     }
@@ -226,77 +433,6 @@ public static class TaskDatabase
         var conn = new MySqlConnection(_connectionString);
         conn.Open();
         return conn;
-    }
-
-    private static int AddTaskLocal(string title, string description, DateTime? reminderDate)
-    {
-        List<CyberTask> tasks = LoadLocalTasks();
-        int newId = tasks.Count == 0 ? 1 : tasks.Max(t => t.Id) + 1;
-        var task = new CyberTask
-        {
-            Id = newId,
-            Title = title,
-            Description = description,
-            ReminderDate = reminderDate,
-            IsCompleted = false,
-            CreatedAt = DateTime.Now
-        };
-
-        tasks.Insert(0, task);
-        SaveLocalTasks(tasks);
-        return newId;
-    }
-
-    private static List<CyberTask> LoadLocalTasks()
-    {
-        try
-        {
-            if (!File.Exists(LocalFallbackPath))
-                return new List<CyberTask>();
-
-            string json = File.ReadAllText(LocalFallbackPath);
-            var tasks = JsonSerializer.Deserialize<List<CyberTask>>(json);
-            return tasks ?? new List<CyberTask>();
-        }
-        catch
-        {
-            return new List<CyberTask>();
-        }
-    }
-
-    private static void SaveLocalTasks(List<CyberTask> tasks)
-    {
-        try
-        {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(tasks, options);
-            File.WriteAllText(LocalFallbackPath, json);
-        }
-        catch
-        {
-            // If local persistence fails, there is nothing else we can do.
-        }
-    }
-
-    private static bool DeleteTaskLocal(int id)
-    {
-        var tasks = LoadLocalTasks();
-        int removed = tasks.RemoveAll(task => task.Id == id);
-        if (removed > 0)
-            SaveLocalTasks(tasks);
-        return removed > 0;
-    }
-
-    private static bool UpdateLocalTask(int id, Action<CyberTask> update)
-    {
-        var tasks = LoadLocalTasks();
-        CyberTask? task = tasks.FirstOrDefault(t => t.Id == id);
-        if (task == null)
-            return false;
-
-        update(task);
-        SaveLocalTasks(tasks);
-        return true;
     }
 
     private static string LoadConnectionString()
@@ -309,12 +445,21 @@ public static class TaskDatabase
         if (File.Exists(configPath))
         {
             using var stream = File.OpenRead(configPath);
-            var doc = JsonDocument.Parse(stream);
-            if (doc.RootElement.TryGetProperty("ConnectionString", out JsonElement value))
+            using var reader = new StreamReader(stream);
+            string json = reader.ReadToEnd();
+            try
             {
-                string? cs = value.GetString();
-                if (!string.IsNullOrWhiteSpace(cs))
-                    return cs;
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("ConnectionString", out var value))
+                {
+                    string? cs = value.GetString();
+                    if (!string.IsNullOrWhiteSpace(cs))
+                        return cs;
+                }
+            }
+            catch
+            {
+                // Fall back to default connection string.
             }
         }
 

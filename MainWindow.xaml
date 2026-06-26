@@ -301,48 +301,119 @@
                            TextWrapping="Wrap"
                            Margin="0,0,0,10"/>
 
-                <StackPanel Grid.Row="2" Orientation="Vertical">
-                    <Border Background="#14142f"
-                            BorderBrush="#1e3a5f"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="10"
-                            Margin="0,0,0,8">
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Add cybersecurity task"
-                                       FontFamily="Consolas"
-                                       FontSize="12"
-                                       Foreground="#e0e0e0"
-                                       FontWeight="Bold"
-                                       Margin="0,0,0,8"/>
-                            <TextBox x:Name="NewTaskTitleTextBox"
-                                     Style="{StaticResource InputBoxStyle}"
-                                     Height="38"
-                                     FontSize="12"
-                                     ToolTip="Task title (e.g. Update password)"
-                                     Margin="0,0,0,8"/>
-                            <TextBox x:Name="NewTaskDescriptionTextBox"
-                                     Style="{StaticResource InputBoxStyle}"
-                                     Height="60"
-                                     FontSize="12"
-                                     TextWrapping="Wrap"
-                                     AcceptsReturn="True"
-                                     VerticalScrollBarVisibility="Auto"
-                                     ToolTip="Task description"
-                                     Margin="0,0,0,8"/>
-                            <TextBox x:Name="NewTaskReminderTextBox"
-                                     Style="{StaticResource InputBoxStyle}"
-                                     Height="38"
-                                     FontSize="12"
-                                     ToolTip="Optional reminder (e.g. tomorrow, in 3 days)"
-                                     Margin="0,0,0,8"/>
+                <Border Grid.Row="2"
+                        Background="#14142f"
+                        BorderBrush="#1e3a5f"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        Margin="0,0,0,8">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Search & filter tasks"
+                                   FontFamily="Consolas"
+                                   FontSize="12"
+                                   Foreground="#e0e0e0"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,8"/>
+                        <TextBox x:Name="TaskSearchTextBox"
+                                 Style="{StaticResource InputBoxStyle}"
+                                 Height="34"
+                                 FontSize="12"
+                                 ToolTip="Search tasks by title or description"
+                                 Margin="0,0,0,8"
+                                 TextChanged="TaskSearchTextBox_TextChanged"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <ComboBox x:Name="TaskFilterComboBox"
+                                      Style="{StaticResource InputBoxStyle}"
+                                      Width="130"
+                                      FontSize="12"
+                                      SelectedIndex="0"
+                                      SelectionChanged="TaskFilterComboBox_SelectionChanged"
+                                      Margin="0,0,8,0">
+                                <ComboBoxItem Content="All"/>
+                                <ComboBoxItem Content="Pending"/>
+                                <ComboBoxItem Content="Completed"/>
+                            </ComboBox>
+                            <ComboBox x:Name="TaskSortComboBox"
+                                      Style="{StaticResource InputBoxStyle}"
+                                      Width="140"
+                                      FontSize="12"
+                                      SelectedIndex="0"
+                                      SelectionChanged="TaskSortComboBox_SelectionChanged">
+                                <ComboBoxItem Content="Newest first"/>
+                                <ComboBoxItem Content="Oldest first"/>
+                                <ComboBoxItem Content="Alphabetical"/>
+                                <ComboBoxItem Content="Due date"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <Button x:Name="ExportTasksButton"
+                                Content="Export tasks"
+                                Style="{StaticResource SendButtonStyle}"
+                                Height="34"
+                                Click="ExportTasksButton_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="3"
+                        Background="#14142f"
+                        BorderBrush="#1e3a5f"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        Margin="0,0,0,8">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Add or edit cybersecurity task"
+                                   FontFamily="Consolas"
+                                   FontSize="12"
+                                   Foreground="#e0e0e0"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,8"/>
+                        <TextBox x:Name="NewTaskTitleTextBox"
+                                 Style="{StaticResource InputBoxStyle}"
+                                 Height="38"
+                                 FontSize="12"
+                                 ToolTip="Task title (e.g. Update password)"
+                                 Margin="0,0,0,8"/>
+                        <TextBox x:Name="NewTaskDescriptionTextBox"
+                                 Style="{StaticResource InputBoxStyle}"
+                                 Height="60"
+                                 FontSize="12"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 ToolTip="Task description"
+                                 Margin="0,0,0,8"/>
+                        <TextBox x:Name="NewTaskReminderTextBox"
+                                 Style="{StaticResource InputBoxStyle}"
+                                 Height="38"
+                                 FontSize="12"
+                                 ToolTip="Optional reminder (e.g. tomorrow, in 3 days)"
+                                 Margin="0,0,0,8"/>
+                        <TextBox x:Name="NewTaskDueDateTextBox"
+                                 Style="{StaticResource InputBoxStyle}"
+                                 Height="38"
+                                 FontSize="12"
+                                 ToolTip="Optional due date (e.g. 2026-08-31 or tomorrow)"
+                                 Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                             <Button x:Name="AddTaskButton"
                                     Content="+ Add Task"
                                     Style="{StaticResource SendButtonStyle}"
                                     Height="36"
+                                    Width="120"
+                                    Margin="0,0,8,0"
                                     Click="AddTaskButton_Click"/>
+                            <Button x:Name="EditTaskButton"
+                                    Content="✎ Edit Task"
+                                    Style="{StaticResource SendButtonStyle}"
+                                    Height="36"
+                                    Width="120"
+                                    Background="#00b8d4"
+                                    Foreground="#ffffff"
+                                    Click="EditTaskButton_Click"/>
                         </StackPanel>
-                    </Border>
+                    </StackPanel>
+                </Border>
 
                     <ListView x:Name="TasksListView"
                               Background="#0d0d1a"
@@ -359,6 +430,7 @@
                                 <GridViewColumn Header="Task" Width="120" DisplayMemberBinding="{Binding Title}"/>
                                 <GridViewColumn Header="Status" Width="70" DisplayMemberBinding="{Binding StatusDisplay}"/>
                                 <GridViewColumn Header="Reminder" Width="100" DisplayMemberBinding="{Binding ReminderDisplay}"/>
+                                <GridViewColumn Header="Due" Width="100" DisplayMemberBinding="{Binding DueDisplay}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -392,11 +464,29 @@
                            TextWrapping="Wrap"/>
 
                 <StackPanel Grid.Row="4" Orientation="Vertical">
-                    <Button Content="🎮 Start Quiz"
-                            Style="{StaticResource SendButtonStyle}"
-                            Height="36"
-                            Margin="0,0,0,6"
-                            Click="StartQuizButton_Click"/>
+                    <ProgressBar x:Name="QuizProgressBar"
+                                 Height="12"
+                                 Minimum="0"
+                                 Maximum="1"
+                                 Value="0"
+                                 Margin="0,0,8,10"
+                                 Foreground="#00e676"
+                                 Background="#0d0d1a"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Content="🎮 Start Quiz"
+                                Style="{StaticResource SendButtonStyle}"
+                                Height="36"
+                                Width="120"
+                                Margin="0,0,8,0"
+                                Click="StartQuizButton_Click"/>
+                        <Button Content="↻ Restart Quiz"
+                                Style="{StaticResource SendButtonStyle}"
+                                Height="36"
+                                Width="120"
+                                Background="#00b8d4"
+                                Foreground="#ffffff"
+                                Click="RestartQuizButton_Click"/>
+                    </StackPanel>
                     <Button Content="📋 View Tasks"
                             Style="{StaticResource SendButtonStyle}"
                             Height="36"
