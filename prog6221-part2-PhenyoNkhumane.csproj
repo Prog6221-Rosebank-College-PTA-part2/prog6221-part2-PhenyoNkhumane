@@ -10,7 +10,6 @@
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Program.cs" />
     <Content Include="CybersecurityChatBot\Greeting.wav" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="dbconfig.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

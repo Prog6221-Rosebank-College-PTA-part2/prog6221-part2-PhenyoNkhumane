@@ -1,13 +1,13 @@
 using System;
+using System.Windows;
 
-class Program
+public static class Program
 {
-    static void Main()
+    [STAThread]
+    public static void Main()
     {
-        VoiceGreeting.PlayVoiceGreeting();
-        AsciiArt.DisplayBanner();
-        string userName = ChatBot.GetUserName();
-        AsciiArt.DisplayWelcome(userName);
-        ChatBot.StartChat(userName);
+        var app = new App();
+        app.InitializeComponent();
+        app.Run();
     }
 }
