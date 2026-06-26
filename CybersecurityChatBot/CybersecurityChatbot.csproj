@@ -11,6 +11,11 @@
 
   <ItemGroup>
     <Content Include="Greeting.wav" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\dbconfig.json" CopyToOutputDirectory="PreserveNewest" Link="dbconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
   </ItemGroup>
 
 </Project>

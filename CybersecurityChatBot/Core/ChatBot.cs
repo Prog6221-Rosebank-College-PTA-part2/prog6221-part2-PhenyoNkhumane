@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /// <summary>
 /// Core chatbot controller for the WPF application.
 ///

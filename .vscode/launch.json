@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/CybersecurityChatbot/bin/Debug/net8.0-windows/CybersecurityChatbot.dll",
+            "program": "${workspaceFolder}/bin/Debug/net10.0-windows/prog6221-part2-PhenyoNkhumane.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/CybersecurityChatbot",
+            "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

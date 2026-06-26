@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CybersecurityChatbot")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+816471905c99b3faf9ba725cbb14a4121637cb75")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+600013f727c5302821c6e6fcf31d8e0f065c73d6")]
 [assembly: System.Reflection.AssemblyProductAttribute("CybersecurityChatbot")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CybersecurityChatbot")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

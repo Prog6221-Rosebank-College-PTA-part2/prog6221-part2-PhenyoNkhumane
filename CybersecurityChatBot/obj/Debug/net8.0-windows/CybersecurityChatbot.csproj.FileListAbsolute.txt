@@ -3,3 +3,4 @@ c:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Deb
 c:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Debug\net8.0-windows\CybersecurityChatbot.AssemblyInfo.cs
 c:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Debug\net8.0-windows\CybersecurityChatbot.csproj.CoreCompileInputs.cache
 c:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Debug\net8.0-windows\CybersecurityChatbot.sourcelink.json
+C:\Users\pheny\Videos\prog6221-part2-PhenyoNkhumane\CybersecurityChatbot\obj\Debug\net8.0-windows\CybersecurityChatbot.csproj.AssemblyReference.cache
