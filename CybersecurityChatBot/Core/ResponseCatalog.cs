@@ -213,21 +213,47 @@ public static class ResponseCatalog
             "backups, Wi-Fi safety, privacy, VPNs, ransomware, encryption, and reporting incidents. " +
             "Type a topic or ask in your own words."),
 
-        (new[] { "tips", "security tips", "cybersecurity tips", "best practices", "best practices for security", "cyber safety tips", "online safety tips", "security advice" },
+        (new[] { "tips", "security tips", "cybersecurity tips", "best practices", "best practices for security", "cyber safety tips", "online safety tips", "security advice", "protect personal data", "personal data protection" },
             null,
-            "Here are some core cybersecurity tips:\n" +
-            "  ✔ Use strong, unique passwords.\n" +
-            "  ✔ Enable multi-factor authentication (MFA).\n" +
-            "  ✔ Watch out for phishing emails and messages.\n" +
-            "  ✔ Keep software and devices updated.\n" +
-            "  ✔ Avoid unsecured public Wi-Fi for sensitive tasks.\n" +
-            "  ✔ Back up important files regularly.\n" +
-            "  ✔ Limit personal information shared online.\n" +
-            "  ✔ Download apps only from trusted sources.\n" +
-            "  ✔ Monitor financial and online accounts.\n" +
-            "  ✔ Use encryption and secure websites (HTTPS).\n" +
-            "  ✔ Securely erase data before disposing of devices.\n" +
-            "  ✔ Stay informed about the latest cybersecurity threats."),
+            "Comprehensive Cybersecurity Tips for Protecting Personal Data:\n" +
+            "Cybersecurity helps protect your devices, accounts, and personal information from unauthorized access, theft, or damage. " +
+            "Use these practical habits to strengthen your privacy, finances, and identity security:\n\n" +
+            "1. Password Safety:\n" +
+            "   • Use strong passwords with 12–16 characters, mixed letters, numbers, and symbols.\n" +
+            "   • Avoid personal information like your name, birthday, or pet names.\n" +
+            "   • Never reuse passwords across multiple accounts.\n" +
+            "   • Consider a password manager to generate and store passwords securely.\n\n" +
+            "2. Multi-Factor Authentication (MFA):\n" +
+            "   • Enable MFA for email, banking, social media, and other critical accounts.\n" +
+            "   • Prefer authenticator apps or hardware keys over SMS when possible.\n\n" +
+            "3. Phishing Awareness:\n" +
+            "   • Watch for poor spelling, urgent requests, and unexpected attachments.\n" +
+            "   • Verify sender addresses and hover over links before clicking.\n" +
+            "   • Never send passwords or codes over email or text.\n\n" +
+            "4. Safe Browsing Practices:\n" +
+            "   • Use HTTPS sites and check for the padlock icon.\n" +
+            "   • Avoid suspicious downloads and pop-ups.\n" +
+            "   • Keep your browser and extensions updated.\n\n" +
+            "5. Device and Network Security:\n" +
+            "   • Protect phones and computers with PINs, passwords, or biometrics.\n" +
+            "   • Use a secure home Wi-Fi network with WPA2/WPA3 and a strong password.\n" +
+            "   • Avoid unsecured public Wi-Fi for sensitive tasks or use a VPN.\n\n" +
+            "6. Data Backups and Malware Protection:\n" +
+            "   • Back up important files regularly using the 3-2-1 rule.\n" +
+            "   • Install reputable antivirus software and scan regularly.\n\n" +
+            "7. Privacy and Personal Information:\n" +
+            "   • Limit what you share on social media.\n" +
+            "   • Review app permissions and remove access that is not needed.\n\n" +
+            "8. Account Monitoring and Threat Awareness:\n" +
+            "   • Check your financial and online accounts frequently for suspicious activity.\n" +
+            "   • Stay informed about new scams and security alerts.\n\n" +
+            "9. Secure Disposal and Device Handling:\n" +
+            "   • Securely erase devices before disposal or recycling.\n" +
+            "   • Remove SIM cards and memory cards.\n\n" +
+            "10. Good Cybersecurity Habits:\n" +
+            "   • Think before you click. Verify before you trust.\n" +
+            "   • Log out of shared computers and do not save passwords on public devices.\n\n" +
+            "These practices give you a strong foundation for protecting personal data, preventing identity theft, and staying safer online."),
 
         (new[] { "menu", "list commands", "options" },
             null,
