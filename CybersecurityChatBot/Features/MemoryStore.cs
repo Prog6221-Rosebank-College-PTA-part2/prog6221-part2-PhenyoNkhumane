@@ -178,6 +178,37 @@ public static class MemoryStore
                "It's a crucial part of staying safe online.";
     }
 
+    /// <summary>Returns a readable profile summary of the current session state.</summary>
+    public static string GetProfileSummary(string? currentTopic)
+    {
+        var lines = new List<string>
+        {
+            string.IsNullOrEmpty(UserName)
+                ? "Here's what I remember about this session:"
+                : $"Here's what I remember about you so far, {UserName}:"
+        };
+
+        if (!string.IsNullOrEmpty(UserName))
+            lines.Add($"  👤 Name: {UserName}");
+
+        if (_interests.Count == 0)
+        {
+            lines.Add("  📌 Topics explored today: none mentioned yet.");
+        }
+        else
+        {
+            string joinedTopics = string.Join(", ", _interests);
+            lines.Add($"  📌 Topics explored today: {joinedTopics}");
+        }
+
+        lines.Add($"  💬 Messages exchanged: {MessageCount}");
+
+        if (!string.IsNullOrEmpty(currentTopic))
+            lines.Add($"  🔍 Current topic: {currentTopic}");
+
+        return string.Join("\n", lines);
+    }
+
     /// <summary>Clears all stored memory for a fresh session.</summary>
     public static void Reset()
     {

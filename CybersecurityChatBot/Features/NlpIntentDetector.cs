@@ -24,6 +24,7 @@ public static class NlpIntentDetector
         ShowSettings,
         ShowHelp,
         ShowSuggestions,
+        ShowProfile,
         ConfirmYes,
         ConfirmNo
     }
@@ -40,8 +41,8 @@ public static class NlpIntentDetector
     {
         "add task", "add a task", "create task", "create a task", "new task",
         "add todo", "create todo", "make a task", "set a task", "add-task",
-        "remember this", "i need to remember", "don't let me forget", "make reminder",
-        "create reminder", "remember", "note this"
+        "remember this", "remember to", "remember that", "i need to remember", "don't let me forget", "make reminder",
+        "create reminder", "note this"
     };
 
     private static readonly string[] ViewTaskPhrases =
@@ -135,6 +136,19 @@ public static class NlpIntentDetector
         "available commands", "help me", "how do i", "how to", "tutorial"
     };
 
+    private static readonly string[] ShowProfilePhrases =
+    {
+        "what do you remember",
+        "what do you know about me",
+        "what have you remembered",
+        "do you remember me",
+        "my profile",
+        "show my profile",
+        "profile",
+        "what do you remember about me",
+        "what have i told you"
+    };
+
     private static readonly string[] SuggestionsPhrases =
     {
         "suggestions", "suggest", "what should i do", "what next", "what can i ask",
@@ -197,6 +211,12 @@ public static class NlpIntentDetector
         if (ContainsAny(input, ViewTaskPhrases))
         {
             result.Intent = Intent.ViewTasks;
+            return result;
+        }
+
+        if (ContainsAny(input, ShowProfilePhrases))
+        {
+            result.Intent = Intent.ShowProfile;
             return result;
         }
 

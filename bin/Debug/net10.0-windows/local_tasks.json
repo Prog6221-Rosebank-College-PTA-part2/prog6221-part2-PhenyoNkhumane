@@ -27,13 +27,13 @@
     {
       "Id": 3,
       "Name": "Vicky",
-      "FavouriteTopic": "2fa",
+      "FavouriteTopic": "malware",
       "BestQuizScore": 0,
       "QuizAttempts": 0,
       "QuizAverageScore": 0,
       "TotalTasks": 0,
       "CompletedTasks": 0,
-      "LastLogin": "2026-06-27T00:37:48.0774499+02:00",
+      "LastLogin": "2026-06-27T01:39:59.1590458+02:00",
       "CreatedAt": "2026-06-26T23:48:40.4831781+02:00"
     },
     {
@@ -79,6 +79,26 @@
       "DueDate": null,
       "IsCompleted": false,
       "CreatedAt": "2026-06-27T01:13:03.268791+02:00"
+    },
+    {
+      "Id": 4,
+      "UserId": 3,
+      "Title": "about me",
+      "Description": "Complete this cybersecurity task: about me.",
+      "ReminderDate": null,
+      "DueDate": null,
+      "IsCompleted": false,
+      "CreatedAt": "2026-06-27T01:35:41.2882429+02:00"
+    },
+    {
+      "Id": 5,
+      "UserId": 3,
+      "Title": "about me",
+      "Description": "Complete this cybersecurity task: about me.",
+      "ReminderDate": null,
+      "DueDate": null,
+      "IsCompleted": false,
+      "CreatedAt": "2026-06-27T01:40:23.3428462+02:00"
     }
   ],
   "Activities": [
@@ -315,6 +335,126 @@
       "UserId": 3,
       "Description": "Processed feature command: what do you remember about me?",
       "Timestamp": "2026-06-27T01:13:03.2722592+02:00"
+    },
+    {
+      "Id": 40,
+      "UserId": 3,
+      "Description": "Responded on topic: phishing.",
+      "Timestamp": "2026-06-27T01:17:32.9522938+02:00"
+    },
+    {
+      "Id": 41,
+      "UserId": 3,
+      "Description": "Responded on topic: password.",
+      "Timestamp": "2026-06-27T01:17:40.9048093+02:00"
+    },
+    {
+      "Id": 42,
+      "UserId": 3,
+      "Description": "Responded on topic: 2fa.",
+      "Timestamp": "2026-06-27T01:17:49.2598594+02:00"
+    },
+    {
+      "Id": 43,
+      "UserId": 3,
+      "Description": "Detected sentiment: Worried.",
+      "Timestamp": "2026-06-27T01:19:19.4962977+02:00"
+    },
+    {
+      "Id": 44,
+      "UserId": 3,
+      "Description": "Detected sentiment: Overwhelmed.",
+      "Timestamp": "2026-06-27T01:19:58.1666101+02:00"
+    },
+    {
+      "Id": 45,
+      "UserId": 3,
+      "Description": "Responded on topic: malware.",
+      "Timestamp": "2026-06-27T01:26:00.2785708+02:00"
+    },
+    {
+      "Id": 46,
+      "UserId": 3,
+      "Description": "Responded on topic: pharming.",
+      "Timestamp": "2026-06-27T01:26:10.7663498+02:00"
+    },
+    {
+      "Id": 47,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: AddTask.",
+      "Timestamp": "2026-06-27T01:35:41.2743093+02:00"
+    },
+    {
+      "Id": 48,
+      "UserId": 3,
+      "Description": "Task added: \u0027about me\u0027 (no reminder set yet).",
+      "Timestamp": "2026-06-27T01:35:41.2898173+02:00"
+    },
+    {
+      "Id": 49,
+      "UserId": 3,
+      "Description": "Processed feature command: what do you remember about me",
+      "Timestamp": "2026-06-27T01:35:41.2912579+02:00"
+    },
+    {
+      "Id": 50,
+      "UserId": 3,
+      "Description": "Detected sentiment: Overwhelmed.",
+      "Timestamp": "2026-06-27T01:38:49.1277136+02:00"
+    },
+    {
+      "Id": 51,
+      "UserId": 3,
+      "Description": "Responded on topic: phishing.",
+      "Timestamp": "2026-06-27T01:39:05.919218+02:00"
+    },
+    {
+      "Id": 52,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: ShowStatistics.",
+      "Timestamp": "2026-06-27T01:39:20.5673962+02:00"
+    },
+    {
+      "Id": 53,
+      "UserId": 3,
+      "Description": "User requested statistics.",
+      "Timestamp": "2026-06-27T01:39:20.5753363+02:00"
+    },
+    {
+      "Id": 54,
+      "UserId": 3,
+      "Description": "Processed feature command: Show statistics",
+      "Timestamp": "2026-06-27T01:39:20.5769417+02:00"
+    },
+    {
+      "Id": 55,
+      "UserId": 3,
+      "Description": "Responded on topic: 2fa.",
+      "Timestamp": "2026-06-27T01:39:31.3481704+02:00"
+    },
+    {
+      "Id": 56,
+      "UserId": 3,
+      "Description": "Responded on topic: malware.",
+      "Timestamp": "2026-06-27T01:39:59.1512109+02:00"
+    },
+    {
+      "Id": 57,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: AddTask.",
+      "Timestamp": "2026-06-27T01:40:23.338342+02:00"
+    },
+    {
+      "Id": 58,
+      "UserId": 3,
+      "Description": "Task added: \u0027about me\u0027 (no reminder set yet).",
+      "Timestamp": "2026-06-27T01:40:23.3444692+02:00"
+    },
+    {
+      "Id": 59,
+      "UserId": 3,
+      "Description": "Processed feature command: what do you remember about me?",
+      "Timestamp": "2026-06-27T01:40:23.3459715+02:00"
     }
   ],
   "Settings": []

@@ -62,6 +62,10 @@ public class Part3FeatureManager
                 ActivityLog.Log("User requested suggestions.");
                 return "[SUGGESTIONS]"; // Special marker for UI
 
+            case NlpIntentDetector.Intent.ShowProfile:
+                ActivityLog.Log("User requested profile summary.");
+                return MemoryStore.GetProfileSummary(null);
+
             case NlpIntentDetector.Intent.ShowActivityLog:
                 return ActivityLog.FormatRecent();
 

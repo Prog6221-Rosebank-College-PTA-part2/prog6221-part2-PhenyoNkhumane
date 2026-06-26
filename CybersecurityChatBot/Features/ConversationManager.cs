@@ -78,6 +78,9 @@ class ConversationManager
         "what do you know about me",
         "what have you remembered",
         "do you remember me",
+        "my profile",
+        "show my profile",
+        "profile",
         "what's my name",
         "what did i say",
         "what have i told you",
@@ -102,19 +105,19 @@ class ConversationManager
 
         string input = rawInput.ToLowerInvariant().Trim();
 
-        // ── 1. Part 3: tasks, quiz, activity log, NLP intents ───────────────────
+        // ── 1. Memory query (explicit: "what do you remember about me?") ──────
+        if (IsMemoryQuery(input))
+        {
+            ActivityLog.Log("User asked what the bot remembers.");
+            return BuildMemoryReport();
+        }
+
+        // ── 2. Part 3: tasks, quiz, activity log, NLP intents ───────────────────
         string? part3Response = _part3.TryHandle(rawInput);
         if (part3Response != null)
         {
             ActivityLog.Log($"Processed feature command: {rawInput}");
             return part3Response;
-        }
-
-        // ── 2. Memory query (explicit: "what do you remember about me?") ──────
-        if (IsMemoryQuery(input))
-        {
-            ActivityLog.Log("User asked what the bot remembers.");
-            return BuildMemoryReport();
         }
 
         // ── 3. Interest capture ───────────────────────────────────────────────
@@ -268,32 +271,7 @@ class ConversationManager
     /// </summary>
     private string BuildMemoryReport()
     {
-        var lines = new List<string>
-        {
-            $"Here's what I've remembered about you so far, {MemoryStore.UserName}:"
-        };
-
-        lines.Add($"  👤 Your name: {MemoryStore.UserName}");
-
-        if (MemoryStore.Interests.Count == 0)
-        {
-            lines.Add("  📌 Topics of interest: none mentioned yet.");
-        }
-        else
-        {
-            lines.Add("  📌 Topics you've shown interest in:");
-            foreach (string topic in MemoryStore.Interests)
-                lines.Add($"      • {topic}");
-        }
-
-        lines.Add($"  💬 Messages exchanged this session: {MemoryStore.MessageCount}");
-
-        if (LastTopic != null)
-            lines.Add($"  🔍 Most recent topic discussed: {LastTopic}");
-
-        lines.Add("\nI'll keep using this to personalise my responses for you!");
-
-        return string.Join("\n", lines);
+        return MemoryStore.GetProfileSummary(LastTopic);
     }
 
     private string? TryExtractInterest(string input)
