@@ -202,7 +202,7 @@ public partial class MainWindow : System.Windows.Window, System.Windows.Markup.I
             return;
         }
         _contentLoaded = true;
-        System.Uri resourceLocater = new System.Uri("/prog6221-part2-PhenyoNkhumane;component/mainwindow.xaml", System.UriKind.Relative);
+        System.Uri resourceLocater = new System.Uri("/prog6221-part2-phenyoNkhumane;component/mainwindow.xaml", System.UriKind.Relative);
         
         #line 1 "..\..\..\MainWindow.xaml"
         System.Windows.Application.LoadComponent(this, resourceLocater);

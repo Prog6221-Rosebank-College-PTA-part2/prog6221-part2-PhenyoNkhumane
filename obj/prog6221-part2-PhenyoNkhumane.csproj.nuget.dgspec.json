@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj": {}
+    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-phenyoNkhumane.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj": {
+    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-phenyoNkhumane.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj",
-        "projectName": "prog6221-part2-PhenyoNkhumane",
-        "projectPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-PhenyoNkhumane.csproj",
+        "projectUniqueName": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-phenyoNkhumane.csproj",
+        "projectName": "prog6221-part2-phenyoNkhumane",
+        "projectPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\prog6221-part2-phenyoNkhumane.csproj",
         "packagesPath": "C:\\Users\\pheny\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\obj\\",
         "projectStyle": "PackageReference",

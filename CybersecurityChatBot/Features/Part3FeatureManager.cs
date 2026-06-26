@@ -35,6 +35,11 @@ public class Part3FeatureManager
                 return taskResponse;
         }
 
+        if (intent.Intent != NlpIntentDetector.Intent.None)
+        {
+            ActivityLog.Log($"Recognised NLP intent: {intent.Intent}.");
+        }
+
         switch (intent.Intent)
         {
             case NlpIntentDetector.Intent.ShowActivityLog:
