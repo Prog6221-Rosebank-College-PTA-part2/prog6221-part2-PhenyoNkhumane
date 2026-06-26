@@ -364,7 +364,19 @@ public static class ResponseCatalog
         (new[] { "help", "i need help", "assist me" },
             null,
             "I can explain password safety, phishing, safe browsing, malware, 2FA, Wi-Fi risks, " +
-            "backups, and more—what would you like to know?")
+            "backups, and more—what would you like to know?"),
+
+        (new[] { "password safety", "make a password", "create a password", "strong password", "how do i make a password", "can you help me", "my password is weak", "what makes a good password", "i forgot my password" },
+            TopicPassword,
+            "A strong password should be long, unique, and hard to guess. Use a passphrase with words, numbers, and symbols, and never reuse it across accounts."),
+
+        (new[] { "generate password", "create password", "suggest password" },
+            TopicPassword,
+            "Suggested Password\nN!9x#Lw7@Qr2\nStrength: ★★★★★\nCopy Password"),
+
+        (new[] { "check password", "check my password", "test password", "password strength" },
+            TopicPassword,
+            "Please provide the password you want me to check.")
     };
 
     // -------------------------------------------------------------------------

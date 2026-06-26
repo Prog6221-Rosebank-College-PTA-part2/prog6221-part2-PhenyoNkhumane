@@ -564,6 +564,17 @@ public static class TaskDatabase
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             );";
         cmd.ExecuteNonQuery();
+
+        cmd.CommandText = @"
+            CREATE TABLE IF NOT EXISTS user_settings (
+                user_id INT NOT NULL PRIMARY KEY,
+                dark_mode TINYINT(1) NOT NULL DEFAULT 1,
+                enable_sounds TINYINT(1) NOT NULL DEFAULT 1,
+                voice_greeting TINYINT(1) NOT NULL DEFAULT 1,
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );";
+        cmd.ExecuteNonQuery();
     }
 
     private static void EnsureReady()

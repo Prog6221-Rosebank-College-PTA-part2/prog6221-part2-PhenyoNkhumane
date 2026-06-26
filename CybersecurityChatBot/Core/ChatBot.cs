@@ -66,6 +66,24 @@ public class ChatBot
         return $"{welcome}\n📋 {dbNote}\n\nType a question about passwords, phishing, 2FA, or use commands like 'start quiz', 'view tasks', or 'show activity log'.";
     }
 
+    public string GetOpeningDashboardMessage()
+    {
+        int userId = TaskDatabase.CurrentUserId;
+        var profile = TaskDatabase.GetUserProfile(userId);
+        if (profile == null)
+            return DashboardManager.GenerateReminderNotification("Review privacy settings", DateTime.Today.AddDays(0));
+
+        var tasks = GetTasks();
+        int pendingTasks = tasks.Count(t => !t.IsCompleted);
+        int completedTasks = tasks.Count(t => t.IsCompleted);
+        var lastTopic = MemoryStore.FavouriteTopic ?? "Password Safety";
+
+        string dashboard = DashboardManager.GenerateDashboard(profile, pendingTasks, completedTasks, profile.QuizAttempts, lastTopic);
+        string reminder = DashboardManager.GenerateReminderNotification("Review privacy settings", DateTime.Today);
+        string tip = DashboardManager.GetDailyTip();
+        return $"{dashboard}\n\n{reminder}\n\n{tip}";
+    }
+
     // -------------------------------------------------------------------------
     // Message processing
     // -------------------------------------------------------------------------
@@ -122,6 +140,14 @@ public class ChatBot
 
     public string AddTask(string title, string description, DateTime? reminderDate, DateTime? dueDate) =>
         _conversation.GetPart3Features().AddTask(title, description, reminderDate, dueDate);
+
+    public string ToggleSettings(string settingName) => _conversation.GetPart3Features().ToggleSettings(settingName);
+
+    public string GeneratePassword() => PasswordUtilities.GeneratePassword();
+
+    public string CheckPasswordStrength(string password) => PasswordUtilities.CheckPasswordStrength(password);
+
+    public string ShowHelpPage() => "❓ Help — Available Commands\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nstart quiz\nshow activity\npassword\nprivacy\nphishing\nadd task\nview tasks\ndelete task\ncomplete task\ngenerate password\ncheck password\nshow dashboard\nshow statistics\nshow settings\nshow help";
 
     public string CompleteTask(int id) =>
         _conversation.GetPart3Features().CompleteTask(id);

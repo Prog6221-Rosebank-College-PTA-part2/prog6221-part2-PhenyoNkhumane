@@ -53,14 +53,18 @@ public partial class MainWindow : Window
             NamePromptOverlay.Visibility = Visibility.Collapsed;
             AppendBotMessage(_chatBot.GetWelcomeMessage(), isWelcome: true);
             
-            // Show dashboard after brief delay
-            var delayTimer = new System.Timers.Timer(300)
+            var delayTimer = new System.Timers.Timer(350)
             {
                 AutoReset = false
             };
             delayTimer.Elapsed += (s, e) =>
             {
-                Dispatcher.Invoke(() => ShowDashboard());
+                Dispatcher.Invoke(() =>
+                {
+                    AppendBotMessage(_chatBot.GetOpeningDashboardMessage(), isWelcome: true);
+                    ShowConversationSuggestions();
+                    RefreshSidebar();
+                });
                 delayTimer.Dispose();
             };
             delayTimer.Start();
@@ -121,7 +125,21 @@ public partial class MainWindow : Window
                 ChatBotResponse result = _chatBot.ProcessMessage(userText);
                 
                 // Check for special UI commands
-                if (result.Message == "[DASHBOARD]")
+                if (userText.StartsWith("check password", StringComparison.OrdinalIgnoreCase))
+                {
+                    string password = userText.Substring("check password".Length).Trim();
+                    AppendBotMessage(_chatBot.CheckPasswordStrength(password), isWarning: false);
+                }
+                else if (userText.StartsWith("generate password", StringComparison.OrdinalIgnoreCase))
+                {
+                    AppendBotMessage($"Suggested Password\n{_chatBot.GeneratePassword()}\nStrength: ★★★★★\nCopy Password", isWarning: false);
+                }
+                else if (userText.StartsWith("toggle ", StringComparison.OrdinalIgnoreCase) || userText.StartsWith("set ", StringComparison.OrdinalIgnoreCase))
+                {
+                    string setting = userText.Replace("toggle ", "", StringComparison.OrdinalIgnoreCase).Replace("set ", "", StringComparison.OrdinalIgnoreCase).Trim();
+                    AppendBotMessage(_chatBot.ToggleSettings(setting), isWarning: false);
+                }
+                else if (result.Message == "[DASHBOARD]")
                 {
                     ShowDashboard();
                 }
@@ -630,6 +648,8 @@ Chat Commands:
   • show statistics    → View detailed statistics
   • show settings      → Open settings menu
   • help               → Show this help menu
+  • generate password  → Create a strong password
+  • check password     → Analyse password strength
 
 Topics to ask about:
   • password safety    → Learn about strong passwords

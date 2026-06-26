@@ -114,4 +114,16 @@ public class Part3FeatureManager
         return $"Task database offline: {TaskDatabase.LastError ?? "unknown error"}. " +
                "Update dbconfig.json or set MAVICKS_DB_CONNECTION.";
     }
+
+    public string ToggleSettings(string settingName)
+    {
+        int userId = TaskDatabase.CurrentUserId;
+        var settings = TaskDatabase.GetOrCreateUserSettings(userId);
+        if (settings == null)
+            return "⚠ Settings are not available right now.";
+
+        string result = settings.ToggleSetting(settingName);
+        TaskDatabase.UpdateUserSettings(userId, settings);
+        return result;
+    }
 }
