@@ -15,25 +15,25 @@
     {
       "Id": 2,
       "Name": "Phenyo",
-      "FavouriteTopic": null,
+      "FavouriteTopic": "phishing",
       "BestQuizScore": 0,
       "QuizAttempts": 0,
       "QuizAverageScore": 0,
       "TotalTasks": 0,
       "CompletedTasks": 0,
-      "LastLogin": "2026-06-26T23:47:00.227675+02:00",
+      "LastLogin": "2026-06-27T00:36:09.9121402+02:00",
       "CreatedAt": "2026-06-26T22:43:30.5422108+02:00"
     },
     {
       "Id": 3,
       "Name": "Vicky",
-      "FavouriteTopic": "pharming",
+      "FavouriteTopic": "2fa",
       "BestQuizScore": 0,
       "QuizAttempts": 0,
       "QuizAverageScore": 0,
       "TotalTasks": 0,
       "CompletedTasks": 0,
-      "LastLogin": "2026-06-27T00:33:13.6240526+02:00",
+      "LastLogin": "2026-06-27T00:37:48.0774499+02:00",
       "CreatedAt": "2026-06-26T23:48:40.4831781+02:00"
     },
     {
@@ -69,6 +69,16 @@
       "DueDate": null,
       "IsCompleted": false,
       "CreatedAt": "2026-06-26T22:46:23.4768921+02:00"
+    },
+    {
+      "Id": 3,
+      "UserId": 3,
+      "Title": "about me",
+      "Description": "Complete this cybersecurity task: about me.",
+      "ReminderDate": null,
+      "DueDate": null,
+      "IsCompleted": false,
+      "CreatedAt": "2026-06-27T01:13:03.268791+02:00"
     }
   ],
   "Activities": [
@@ -251,6 +261,60 @@
       "UserId": 3,
       "Description": "Responded on topic: pharming.",
       "Timestamp": "2026-06-27T00:33:13.6191812+02:00"
+    },
+    {
+      "Id": 31,
+      "UserId": 2,
+      "Description": "Responded on topic: phishing.",
+      "Timestamp": "2026-06-27T00:36:09.9071809+02:00"
+    },
+    {
+      "Id": 32,
+      "UserId": 3,
+      "Description": "Responded on topic: phishing.",
+      "Timestamp": "2026-06-27T00:37:28.9278756+02:00"
+    },
+    {
+      "Id": 33,
+      "UserId": 3,
+      "Description": "Responded on topic: password.",
+      "Timestamp": "2026-06-27T00:37:39.3578093+02:00"
+    },
+    {
+      "Id": 34,
+      "UserId": 3,
+      "Description": "Responded on topic: 2fa.",
+      "Timestamp": "2026-06-27T00:37:48.0762902+02:00"
+    },
+    {
+      "Id": 35,
+      "UserId": 3,
+      "Description": "Detected sentiment: Worried.",
+      "Timestamp": "2026-06-27T01:11:56.8628106+02:00"
+    },
+    {
+      "Id": 36,
+      "UserId": 3,
+      "Description": "Detected sentiment: Overwhelmed.",
+      "Timestamp": "2026-06-27T01:12:17.5257666+02:00"
+    },
+    {
+      "Id": 37,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: AddTask.",
+      "Timestamp": "2026-06-27T01:13:03.2553807+02:00"
+    },
+    {
+      "Id": 38,
+      "UserId": 3,
+      "Description": "Task added: \u0027about me\u0027 (no reminder set yet).",
+      "Timestamp": "2026-06-27T01:13:03.2701023+02:00"
+    },
+    {
+      "Id": 39,
+      "UserId": 3,
+      "Description": "Processed feature command: what do you remember about me?",
+      "Timestamp": "2026-06-27T01:13:03.2722592+02:00"
     }
   ],
   "Settings": []

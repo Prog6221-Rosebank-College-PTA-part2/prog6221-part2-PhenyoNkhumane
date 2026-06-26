@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Central knowledge base for the chatbot.
@@ -396,7 +397,7 @@ public static class ResponseCatalog
         {
             foreach (var keyword in entry.Keywords)
             {
-                if (input.Contains(keyword))
+                if (MatchesKeyword(input, keyword))
                 {
                     matchedTopic = entry.Topic;
                     return entry.Response;
@@ -406,6 +407,23 @@ public static class ResponseCatalog
 
         matchedTopic = null;
         return DefaultResponse;
+    }
+
+    private static bool MatchesKeyword(string input, string keyword)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+            return false;
+
+        string escapedKeyword = Regex.Escape(keyword);
+
+        // If keyword is a phrase, match it as a full phrase boundary. If it's a single word,
+        // require word boundaries to avoid substrings like "hi" matching inside "phishing".
+        if (keyword.Contains(' '))
+        {
+            return Regex.IsMatch(input, $"(^|\\W){escapedKeyword}($|\\W)", RegexOptions.CultureInvariant);
+        }
+
+        return Regex.IsMatch(input, $"(^|\\b){escapedKeyword}(\\b|$)", RegexOptions.CultureInvariant);
     }
 
     /// <summary>
