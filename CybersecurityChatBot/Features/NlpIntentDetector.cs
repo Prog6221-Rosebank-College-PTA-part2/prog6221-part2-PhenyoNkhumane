@@ -39,7 +39,9 @@ public static class NlpIntentDetector
     private static readonly string[] AddTaskPhrases =
     {
         "add task", "add a task", "create task", "create a task", "new task",
-        "add todo", "create todo", "make a task", "set a task", "add-task"
+        "add todo", "create todo", "make a task", "set a task", "add-task",
+        "remember this", "i need to remember", "don't let me forget", "make reminder",
+        "create reminder", "remember", "note this"
     };
 
     private static readonly string[] ViewTaskPhrases =
@@ -56,13 +58,16 @@ public static class NlpIntentDetector
     private static readonly string[] CompleteTaskPhrases =
     {
         "complete task", "mark task", "mark as complete", "finish task",
-        "task done", "task completed", "done with task"
+        "task done", "task completed", "done with task", "completed",
+        "mark it complete", "finish it"
     };
 
     private static readonly string[] ReminderPhrases =
     {
         "remind me", "set a reminder", "set reminder", "schedule reminder",
-        "reminder for", "remind me to", "can you remind me", "don't let me forget"
+        "reminder for", "remind me to", "can you remind me", "don't let me forget",
+        "please remind me", "could you remind me", "make reminder", "remember this",
+        "i need to remember", "remind me later", "remind me in"
     };
 
     private static readonly string[] ImplicitTaskPhrases =

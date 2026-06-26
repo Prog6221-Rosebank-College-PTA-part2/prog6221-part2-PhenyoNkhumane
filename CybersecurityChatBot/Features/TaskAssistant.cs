@@ -85,7 +85,7 @@ public class TaskAssistant
                 ? $"Reminder: {FormatFriendlyDate(reminderDate.Value)}"
                 : "Reminder: none";
 
-            return $"✓ Task added successfully!\n\nTitle: {title}\n{reminderLine}\n\nGood luck staying secure!";
+            return $"✓ Task added successfully!\n\nTitle: {title}\n{reminderLine}\n\nWould you like a reminder?";
         }
         catch (Exception ex)
         {
@@ -107,7 +107,7 @@ public class TaskAssistant
 
             UpdateTaskStats();
             ActivityLog.Log($"Task completed: '{task.Title}'.");
-            return "✓ Task marked as completed.\n\nWell done!";
+            return "Completed";
         }
         catch (Exception ex)
         {
@@ -129,7 +129,7 @@ public class TaskAssistant
 
             UpdateTaskStats();
             ActivityLog.Log($"Task deleted: '{task.Title}'.");
-            return "🗑 Task deleted successfully.";
+            return "Delete Task";
         }
         catch (Exception ex)
         {
