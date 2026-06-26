@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -221,26 +224,33 @@ public partial class MainWindow : Window
     {
         try
         {
-            var tasks = _chatBot.GetTasks();
+            var tasks = GetVisibleTasks(_chatBot.GetTasks());
             if (tasks.Count == 0)
             {
                 AppendBotMessage("There are no tasks to export.", isWarning: true);
                 return;
             }
 
-            string fileName = $"MavicksTasks_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string baseName = $"MavicksTasks_{DateTime.Now:yyyyMMdd_HHmmss}";
+            string csvPath = Path.Combine(desktop, baseName + ".csv");
+            string txtPath = Path.Combine(desktop, baseName + ".txt");
 
-            var lines = new List<string> { "Id,Title,Description,Status,Reminder,Due,CreatedAt" };
+            var csvLines = new List<string> { "Id,Title,Description,Priority,Category,Status,Reminder,Due,CreatedAt" };
+            var txtLines = new List<string> { "Mavicks Cybersecurity Tasks", "===========================" };
+
             foreach (var task in tasks)
             {
                 string safeTitle       = task.Title.Replace(",", " ").Replace("\n", " ");
                 string safeDescription = task.Description.Replace(",", " ").Replace("\n", " ");
-                lines.Add($"{task.Id},\"{safeTitle}\",\"{safeDescription}\",{task.StatusDisplay},\"{task.ReminderDisplay}\",\"{task.DueDisplay}\",{task.CreatedAt:yyyy-MM-dd HH:mm}");
+                csvLines.Add($"{task.Id},\"{safeTitle}\",\"{safeDescription}\",{task.PriorityDisplay},{task.CategoryDisplay},{task.StatusDisplay},\"{task.ReminderDisplay}\",\"{task.DueDisplay}\",{task.CreatedAt:yyyy-MM-dd HH:mm}");
+                txtLines.Add($"[{task.Id}] {task.Title} | {task.PriorityDisplay} | {task.CategoryDisplay} | {task.StatusDisplay}");
+                txtLines.Add($"   {task.Description}");
             }
 
-            System.IO.File.WriteAllLines(path, lines);
-            AppendBotMessage($"Tasks exported to your desktop as {fileName}.");
+            File.WriteAllLines(csvPath, csvLines);
+            File.WriteAllLines(txtPath, txtLines);
+            AppendBotMessage($"Tasks exported to your desktop as {Path.GetFileName(csvPath)} and {Path.GetFileName(txtPath)}.");
         }
         catch (Exception ex)
         {
@@ -266,8 +276,9 @@ public partial class MainWindow : Window
         {
             if (TasksDataGrid != null)
             {
+                var tasks = GetVisibleTasks(_chatBot.GetTasks());
                 TasksDataGrid.ItemsSource = null;
-                TasksDataGrid.ItemsSource = _chatBot.GetTasks();
+                TasksDataGrid.ItemsSource = tasks;
             }
 
             if (QuizStatusTextBlock != null)
@@ -293,6 +304,7 @@ public partial class MainWindow : Window
         string title       = NewTaskTitleTextBox.Text.Trim();
         string description = NewTaskDescriptionTextBox.Text.Trim();
         DateTime? reminderDate = NewTaskReminderDatePicker.SelectedDate?.Date;
+        DateTime? dueDate = TryParseDate(NewTaskDueDateTextBox.Text);
 
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -313,12 +325,13 @@ public partial class MainWindow : Window
         }
 
         AppendUserMessage($"Add task - {title}: {description}");
-        string response = _chatBot.AddTask(title, description, reminderDate, null);
+        string response = _chatBot.AddTask(title, description, reminderDate, dueDate);
         AppendBotMessage(response, isWarning: response.StartsWith("⚠", StringComparison.Ordinal));
 
         NewTaskTitleTextBox.Clear();
         NewTaskDescriptionTextBox.Clear();
         NewTaskReminderDatePicker.SelectedDate = null;
+        NewTaskDueDateTextBox.Clear();
         RefreshSidebar();
     }
 
@@ -370,6 +383,55 @@ public partial class MainWindow : Window
         {
             AppendBotMessage("Select a task from the list first, then click Edit.", isWarning: true);
         }
+    }
+
+    private IReadOnlyList<CyberTask> GetVisibleTasks(IEnumerable<CyberTask> tasks)
+    {
+        var query = tasks.AsEnumerable();
+        string search = TaskSearchTextBox?.Text?.Trim() ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase) || t.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
+
+        string filter = (TaskFilterComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "All";
+        switch (filter)
+        {
+            case "Pending":
+                query = query.Where(t => !t.IsCompleted);
+                break;
+            case "Completed":
+                query = query.Where(t => t.IsCompleted);
+                break;
+            case "Due Today":
+                query = query.Where(t => t.IsDueToday);
+                break;
+            case "High Priority":
+                query = query.Where(t => t.IsHighPriority);
+                break;
+        }
+
+        string sort = (TaskSortComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Newest first";
+        return sort switch
+        {
+            "Oldest first" => query.OrderBy(t => t.CreatedAt).ToList(),
+            "Alphabetical" => query.OrderBy(t => t.Title, StringComparer.OrdinalIgnoreCase).ToList(),
+            "Due date" => query.OrderBy(t => t.DueDate ?? DateTime.MaxValue).ToList(),
+            _ => query.OrderByDescending(t => t.CreatedAt).ToList()
+        };
+    }
+
+    private static DateTime? TryParseDate(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return null;
+
+        string value = text.Trim();
+        if (value.Equals("today", StringComparison.OrdinalIgnoreCase))
+            return DateTime.Today;
+        if (value.Equals("tomorrow", StringComparison.OrdinalIgnoreCase))
+            return DateTime.Today.AddDays(1);
+        if (DateTime.TryParse(value, out DateTime parsed))
+            return parsed;
+        return null;
     }
 
     private void AppendUserMessage(string text)

@@ -360,6 +360,8 @@
                                 <ComboBoxItem Content="All"/>
                                 <ComboBoxItem Content="Pending"/>
                                 <ComboBoxItem Content="Completed"/>
+                                <ComboBoxItem Content="Due Today"/>
+                                <ComboBoxItem Content="High Priority"/>
                             </ComboBox>
                             <ComboBox x:Name="TaskSortComboBox"
                                       Style="{StaticResource ComboBoxStyle}"
@@ -467,6 +469,8 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="30"/>
                             <DataGridTextColumn Header="Task" Binding="{Binding Title}" Width="120"/>
+                            <DataGridTextColumn Header="Priority" Binding="{Binding PriorityDisplay}" Width="70"/>
+                            <DataGridTextColumn Header="Category" Binding="{Binding CategoryDisplay}" Width="80"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding StatusDisplay}" Width="70"/>
                             <DataGridTextColumn Header="Reminder" Binding="{Binding ReminderDisplay}" Width="100"/>
                             <DataGridTextColumn Header="Due" Binding="{Binding DueDisplay}" Width="100"/>

@@ -24,4 +24,36 @@ public class CyberTask
             : "No due date";
 
     public string StatusDisplay => IsCompleted ? "Completed" : "Pending";
+
+    public string PriorityDisplay => InferPriority();
+
+    public string CategoryDisplay => InferCategory();
+
+    public bool IsHighPriority => PriorityDisplay.Equals("High", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsDueToday => DueDate.HasValue && !IsCompleted && DueDate.Value.Date == DateTime.Today;
+
+    private string InferPriority()
+    {
+        string text = $"{Title} {Description}".ToLowerInvariant();
+        if (text.Contains("urgent") || text.Contains("critical") || text.Contains("2fa") || text.Contains("password") || text.Contains("privacy") || text.Contains("phishing"))
+            return "High";
+
+        if (text.Contains("review") || text.Contains("update") || text.Contains("backup") || text.Contains("reminder"))
+            return "Medium";
+
+        return "Low";
+    }
+
+    private string InferCategory()
+    {
+        string text = $"{Title} {Description}".ToLowerInvariant();
+        if (text.Contains("password")) return "Passwords";
+        if (text.Contains("privacy")) return "Privacy";
+        if (text.Contains("phish")) return "Phishing";
+        if (text.Contains("malware") || text.Contains("virus")) return "Malware";
+        if (text.Contains("network") || text.Contains("wifi")) return "Networking";
+        if (text.Contains("backup") || text.Contains("update")) return "System";
+        return "General";
+    }
 }
