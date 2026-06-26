@@ -8,5 +8,6 @@
 //------------------------------------------------------------------------------
 
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("cybersecuritychatbot/greeting.wav")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("dbconfig.json")]
 
 

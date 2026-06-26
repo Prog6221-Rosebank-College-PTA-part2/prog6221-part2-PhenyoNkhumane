@@ -55,6 +55,7 @@ public partial class MainWindow : Window
             Title = $"🔐 Mavicks — {_chatBot.GetUserName()}";
             UserInputBox.IsEnabled = true;
             SendButton.IsEnabled   = true;
+            RefreshSidebar();
             UserInputBox.Focus();
         });
     }
@@ -91,6 +92,7 @@ public partial class MainWindow : Window
 
         ChatBotResponse result = _chatBot.ProcessMessage(userText);
         AppendBotMessage(result.Message, isWarning: result.IsWarning);
+        RefreshSidebar();
 
         if (result.IsExit)
         {
@@ -98,6 +100,40 @@ public partial class MainWindow : Window
         }
 
         UserInputBox.Focus();
+    }
+
+    private void StartQuizButton_Click(object sender, RoutedEventArgs e) =>
+        RunQuickCommand("Start quiz");
+
+    private void ViewTasksButton_Click(object sender, RoutedEventArgs e) =>
+        RunQuickCommand("View tasks");
+
+    private void ActivityLogButton_Click(object sender, RoutedEventArgs e) =>
+        RunQuickCommand("Show activity log");
+
+    private void RefreshTasksButton_Click(object sender, RoutedEventArgs e) =>
+        RefreshSidebar();
+
+    private void RunQuickCommand(string command)
+    {
+        if (!_chatBot.SessionStarted)
+            return;
+
+        AppendUserMessage(command);
+        ChatBotResponse result = _chatBot.ProcessQuickCommand(command);
+        AppendBotMessage(result.Message, isWarning: result.IsWarning);
+        RefreshSidebar();
+        UserInputBox.Focus();
+    }
+
+    private void RefreshSidebar()
+    {
+        TasksListView.ItemsSource = null;
+        TasksListView.ItemsSource = _chatBot.GetTasks();
+        QuizStatusTextBlock.Text = _chatBot.GetQuizStatusText();
+        DbStatusTextBlock.Text = TaskDatabase.IsAvailable
+            ? "Database: connected ✓"
+            : $"Database: offline — {TaskDatabase.LastError}";
     }
 
     private void AppendUserMessage(string text)

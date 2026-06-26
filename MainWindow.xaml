@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="🔐 Mavicks — Cybersecurity Awareness Assistant"
-        Height="850" Width="900"
-        MinHeight="600" MinWidth="700"
+        Height="850" Width="1100"
+        MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         Background="#0d0d1a">
 
@@ -97,6 +97,13 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- MAIN CHAT COLUMN -->
+        <Grid Grid.Column="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -250,6 +257,96 @@
                 </StackPanel>
             </Border>
         </Grid>
+
+        </Grid>
+
+        <!-- SIDEBAR — TASKS & QUICK ACTIONS -->
+        <Border Grid.Column="1"
+                Background="#12122a"
+                BorderBrush="#1e3a5f"
+                BorderThickness="1,0,0,0"
+                Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="📋 Task Assistant"
+                           FontFamily="Consolas"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="#00e5ff"
+                           Margin="0,0,0,8"/>
+
+                <TextBlock Grid.Row="1"
+                           x:Name="DbStatusTextBlock"
+                           Text="Database: checking..."
+                           FontFamily="Consolas"
+                           FontSize="10"
+                           Foreground="#607d8b"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"/>
+
+                <ListView Grid.Row="2"
+                          x:Name="TasksListView"
+                          Background="#0d0d1a"
+                          BorderBrush="#1e3a5f"
+                          BorderThickness="1"
+                          Foreground="#e0e0e0"
+                          FontFamily="Consolas"
+                          FontSize="11">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="ID" Width="30" DisplayMemberBinding="{Binding Id}"/>
+                            <GridViewColumn Header="Task" Width="140" DisplayMemberBinding="{Binding Title}"/>
+                            <GridViewColumn Header="Status" Width="70" DisplayMemberBinding="{Binding StatusDisplay}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <TextBlock Grid.Row="3"
+                           x:Name="QuizStatusTextBlock"
+                           Text="No quiz in progress"
+                           FontFamily="Consolas"
+                           FontSize="11"
+                           Foreground="#00e676"
+                           Margin="0,10,0,8"
+                           TextWrapping="Wrap"/>
+
+                <StackPanel Grid.Row="4" Orientation="Vertical">
+                    <Button Content="🎮 Start Quiz"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="36"
+                            Margin="0,0,0,6"
+                            Click="StartQuizButton_Click"/>
+                    <Button Content="📋 View Tasks"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="36"
+                            Margin="0,0,0,6"
+                            Background="#37474f"
+                            Foreground="#e0e0e0"
+                            Click="ViewTasksButton_Click"/>
+                    <Button Content="📜 Activity Log"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="36"
+                            Margin="0,0,0,6"
+                            Background="#37474f"
+                            Foreground="#e0e0e0"
+                            Click="ActivityLogButton_Click"/>
+                    <Button Content="↻ Refresh Tasks"
+                            Style="{StaticResource SendButtonStyle}"
+                            Height="36"
+                            Background="#1e3a5f"
+                            Foreground="#e0e0e0"
+                            Click="RefreshTasksButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
     </Grid>
 </Window>
