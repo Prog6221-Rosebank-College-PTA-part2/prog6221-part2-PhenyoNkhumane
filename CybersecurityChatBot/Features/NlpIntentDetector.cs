@@ -19,6 +19,11 @@ public static class NlpIntentDetector
         StartQuiz,
         ShowActivityLog,
         ShowMoreActivityLog,
+        ShowDashboard,
+        ShowStatistics,
+        ShowSettings,
+        ShowHelp,
+        ShowSuggestions,
         ConfirmYes,
         ConfirmNo
     }
@@ -99,10 +104,70 @@ public static class NlpIntentDetector
         "no", "nope", "nah", "not now", "skip", "no thanks", "don't"
     };
 
+    private static readonly string[] DashboardPhrases =
+    {
+        "show dashboard", "dashboard", "home", "home screen", "main screen",
+        "show home", "display dashboard", "start screen"
+    };
+
+    private static readonly string[] StatisticsPhrases =
+    {
+        "show statistics", "statistics", "stats", "show stats", "display statistics",
+        "my statistics", "my stats", "show my statistics", "show my stats"
+    };
+
+    private static readonly string[] SettingsPhrases =
+    {
+        "show settings", "settings", "preferences", "show preferences", "configuration",
+        "configure", "show configuration", "options", "show options"
+    };
+
+    private static readonly string[] HelpPhrases =
+    {
+        "help", "show help", "show commands", "commands", "what can you do",
+        "available commands", "help me", "how do i", "how to", "tutorial"
+    };
+
+    private static readonly string[] SuggestionsPhrases =
+    {
+        "suggestions", "suggest", "what should i do", "what next", "what can i ask",
+        "give me suggestions", "show suggestions", "tell me what to do"
+    };
+
     public static IntentResult Detect(string rawInput)
     {
         string input = rawInput.ToLowerInvariant().Trim();
         var result   = new IntentResult { Intent = Intent.None };
+
+        if (ContainsAny(input, DashboardPhrases))
+        {
+            result.Intent = Intent.ShowDashboard;
+            return result;
+        }
+
+        if (ContainsAny(input, StatisticsPhrases))
+        {
+            result.Intent = Intent.ShowStatistics;
+            return result;
+        }
+
+        if (ContainsAny(input, SettingsPhrases))
+        {
+            result.Intent = Intent.ShowSettings;
+            return result;
+        }
+
+        if (ContainsAny(input, HelpPhrases))
+        {
+            result.Intent = Intent.ShowHelp;
+            return result;
+        }
+
+        if (ContainsAny(input, SuggestionsPhrases))
+        {
+            result.Intent = Intent.ShowSuggestions;
+            return result;
+        }
 
         if (ContainsAny(input, ShowMoreLogPhrases))
         {

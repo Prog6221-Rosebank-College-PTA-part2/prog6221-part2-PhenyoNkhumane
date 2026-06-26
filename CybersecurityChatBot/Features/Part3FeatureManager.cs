@@ -42,6 +42,26 @@ public class Part3FeatureManager
 
         switch (intent.Intent)
         {
+            case NlpIntentDetector.Intent.ShowDashboard:
+                ActivityLog.Log("User requested dashboard view.");
+                return "[DASHBOARD]"; // Special marker for UI
+
+            case NlpIntentDetector.Intent.ShowStatistics:
+                ActivityLog.Log("User requested statistics.");
+                return "[STATISTICS]"; // Special marker for UI
+
+            case NlpIntentDetector.Intent.ShowSettings:
+                ActivityLog.Log("User requested settings.");
+                return "[SETTINGS]"; // Special marker for UI
+
+            case NlpIntentDetector.Intent.ShowHelp:
+                ActivityLog.Log("User requested help.");
+                return "[HELP]"; // Special marker for UI
+
+            case NlpIntentDetector.Intent.ShowSuggestions:
+                ActivityLog.Log("User requested suggestions.");
+                return "[SUGGESTIONS]"; // Special marker for UI
+
             case NlpIntentDetector.Intent.ShowActivityLog:
                 return ActivityLog.FormatRecent();
 

@@ -39,17 +39,32 @@ public static class ActivityLog
             : _entries.Take(Math.Min(count, _entries.Count));
 
         var sb = new StringBuilder();
-        sb.AppendLine("Here's a summary of recent actions:");
+        sb.AppendLine("📅 Activity Log");
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-        int index = 1;
         foreach (ActivityEntry entry in slice)
         {
-            sb.AppendLine($"  {index}. [{entry.Timestamp:HH:mm dd MMM}] {entry.Description}");
-            index++;
+            // Format with emoji icons based on action type
+            string icon = entry.Description switch
+            {
+                var s when s.Contains("Quiz") => "🎮",
+                var s when s.Contains("Task") || s.Contains("task") => "📝",
+                var s when s.Contains("Completed") || s.Contains("completed") => "✅",
+                var s when s.Contains("Reminder") || s.Contains("reminder") => "🔔",
+                var s when s.Contains("Password") || s.Contains("password") => "🔐",
+                var s when s.Contains("Phishing") || s.Contains("phishing") => "🎣",
+                _ => "📌"
+            };
+
+            sb.AppendLine($"{icon} {entry.Timestamp:HH:mm}");
+            sb.AppendLine($"   {entry.Description}");
+            sb.AppendLine();
         }
 
+        sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
         if (!showAll && _entries.Count > count)
-            sb.AppendLine($"\n({ _entries.Count - count} older entries hidden — type \"show more activity log\" to see all.)");
+            sb.AppendLine($"({_entries.Count - count} older entries — type \"show more activity log\" to see all)");
 
         return sb.ToString().TrimEnd();
     }

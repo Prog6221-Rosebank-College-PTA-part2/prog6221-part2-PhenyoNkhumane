@@ -118,6 +118,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- ROW 0 — HEADER -->
@@ -164,8 +165,24 @@
             <StackPanel x:Name="ChatPanel" Orientation="Vertical"/>
         </ScrollViewer>
 
-        <!-- ROW 2 — INPUT BAR -->
+        <!-- ROW 2 — CONVERSATION SUGGESTIONS -->
         <Border Grid.Row="2"
+                Background="#0d0d1a"
+                BorderBrush="#1e3a5f"
+                BorderThickness="0,1,0,0"
+                Padding="16,8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="💬 Quick Topics: " Foreground="#607d8b" FontSize="11" FontFamily="Consolas" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <Button x:Name="SuggestionPasswordBtn" Content="🔐 Password Safety" Background="Transparent" Foreground="#00e5ff" Cursor="Hand" Click="SuggestionButton_Click" Tag="password" Padding="4,0" Margin="0,0,6,0" FontFamily="Consolas" FontSize="10"/>
+                <Button Content="🎣 Phishing" Background="Transparent" Foreground="#00e676" Cursor="Hand" Click="SuggestionButton_Click" Tag="phishing" Padding="4,0" Margin="0,0,6,0" FontFamily="Consolas" FontSize="10"/>
+                <Button Content="🛡️ Privacy" Background="Transparent" Foreground="#ffab00" Cursor="Hand" Click="SuggestionButton_Click" Tag="privacy" Padding="4,0" Margin="0,0,6,0" FontFamily="Consolas" FontSize="10"/>
+                <Button Content="📊 Stats" Background="Transparent" Foreground="#00b8d4" Cursor="Hand" Click="SuggestionButton_Click" Tag="statistics" Padding="4,0" Margin="0,0,6,0" FontFamily="Consolas" FontSize="10"/>
+                <Button Content="📖 Help" Background="Transparent" Foreground="#a0a0a0" Cursor="Hand" Click="SuggestionButton_Click" Tag="help" Padding="4,0" FontFamily="Consolas" FontSize="10"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ROW 3 — INPUT BAR -->
+        <Border Grid.Row="3"
                 Background="#12122a"
                 BorderBrush="#1e3a5f"
                 BorderThickness="0,1,0,0"
@@ -206,7 +223,7 @@
                             Click="ClearButton_Click"/>
                 </Grid>
 
-                <TextBlock Text="Try: start quiz • view tasks • show activity log • ask about phishing, passwords, 2FA"
+                <TextBlock Text="💡 Tip: Ask about cybersecurity topics or use 'help' command"
                            FontFamily="Consolas"
                            FontSize="11"
                            Foreground="#607d8b"
@@ -217,7 +234,7 @@
 
         <!-- NAME PROMPT OVERLAY -->
         <Grid Grid.Row="0"
-              Grid.RowSpan="3"
+              Grid.RowSpan="4"
               x:Name="NamePromptOverlay"
               Background="#CC0d0d1a"
               Visibility="Visible">

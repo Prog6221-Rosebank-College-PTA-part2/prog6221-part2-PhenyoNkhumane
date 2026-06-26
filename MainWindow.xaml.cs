@@ -52,6 +52,19 @@ public partial class MainWindow : Window
         {
             NamePromptOverlay.Visibility = Visibility.Collapsed;
             AppendBotMessage(_chatBot.GetWelcomeMessage(), isWelcome: true);
+            
+            // Show dashboard after brief delay
+            var delayTimer = new System.Timers.Timer(300)
+            {
+                AutoReset = false
+            };
+            delayTimer.Elapsed += (s, e) =>
+            {
+                Dispatcher.Invoke(() => ShowDashboard());
+                delayTimer.Dispose();
+            };
+            delayTimer.Start();
+
             Title = $"🔐 Mavicks — {_chatBot.GetUserName()}";
             UserInputBox.IsEnabled = true;
             SendButton.IsEnabled   = true;
@@ -90,16 +103,61 @@ public partial class MainWindow : Window
         AppendUserMessage(userText);
         UserInputBox.Clear();
 
-        ChatBotResponse result = _chatBot.ProcessMessage(userText);
-        AppendBotMessage(result.Message, isWarning: result.IsWarning);
-        RefreshSidebar();
+        // Show typing animation
+        AppendTypingIndicator();
 
-        if (result.IsExit)
+        // Process message with a slight delay for realism
+        var delayTimer = new System.Timers.Timer(TypingAnimation.GetTypingDelay())
         {
-            AppendSystemMessage("Session ended. You can keep typing to continue the conversation.");
-        }
+            AutoReset = false
+        };
+        delayTimer.Elapsed += (s, e) =>
+        {
+            Dispatcher.Invoke(() =>
+            {
+                // Remove typing indicator
+                RemoveLastMessage();
 
-        UserInputBox.Focus();
+                ChatBotResponse result = _chatBot.ProcessMessage(userText);
+                
+                // Check for special UI commands
+                if (result.Message == "[DASHBOARD]")
+                {
+                    ShowDashboard();
+                }
+                else if (result.Message == "[STATISTICS]")
+                {
+                    ShowStatistics();
+                }
+                else if (result.Message == "[SETTINGS]")
+                {
+                    ShowSettings();
+                }
+                else if (result.Message == "[HELP]")
+                {
+                    ShowHelp();
+                }
+                else if (result.Message == "[SUGGESTIONS]")
+                {
+                    ShowConversationSuggestions();
+                }
+                else
+                {
+                    AppendBotMessage(result.Message, isWarning: result.IsWarning);
+                }
+
+                RefreshSidebar();
+
+                if (result.IsExit)
+                {
+                    AppendSystemMessage("Session ended. You can keep typing to continue the conversation.");
+                }
+
+                UserInputBox.Focus();
+            });
+            delayTimer.Dispose();
+        };
+        delayTimer.Start();
     }
 
     private void StartQuizButton_Click(object sender, RoutedEventArgs e) =>
@@ -459,5 +517,162 @@ public partial class MainWindow : Window
         var anim = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300));
         anim.Completed += (s, e) => onComplete?.Invoke();
         element.BeginAnimation(UIElement.OpacityProperty, anim);
+    }
+
+    /// <summary>
+    /// Appends a typing indicator message.
+    /// </summary>
+    private void AppendTypingIndicator()
+    {
+        var tb = new TextBlock
+        {
+            Text                = TypingAnimation.GetTypingIndicator(),
+            Foreground          = BrushBotText,
+            FontFamily          = new FontFamily("Consolas"),
+            FontSize            = 12,
+            Margin              = new Thickness(0, 8, 80, 8),
+            TextWrapping        = TextWrapping.Wrap
+        };
+
+        ChatPanel.Children.Add(tb);
+        ScrollToBottom();
+    }
+
+    /// <summary>
+    /// Removes the last message from the chat panel.
+    /// </summary>
+    private void RemoveLastMessage()
+    {
+        if (ChatPanel.Children.Count > 0)
+            ChatPanel.Children.RemoveAt(ChatPanel.Children.Count - 1);
+    }
+
+    /// <summary>
+    /// Displays the home dashboard after login.
+    /// </summary>
+    private void ShowDashboard()
+    {
+        int userId = TaskDatabase.CurrentUserId;
+        var profile = TaskDatabase.GetUserProfile(userId);
+        
+        if (profile == null)
+        {
+            AppendBotMessage("Dashboard data not available.", isWarning: true);
+            return;
+        }
+
+        var tasks = _chatBot.GetTasks();
+        int pendingTasks = tasks.Count(t => !t.IsCompleted);
+        int completedTasks = tasks.Count(t => t.IsCompleted);
+        var lastTopic = MemoryStore.FavouriteTopic ?? "General";
+
+        string dashboard = DashboardManager.GenerateDashboard(profile, pendingTasks, completedTasks, profile.QuizAttempts, lastTopic);
+        AppendBotMessage(dashboard, isWelcome: true);
+    }
+
+    /// <summary>
+    /// Displays the statistics panel.
+    /// </summary>
+    private void ShowStatistics()
+    {
+        int userId = TaskDatabase.CurrentUserId;
+        var profile = TaskDatabase.GetUserProfile(userId);
+
+        if (profile == null)
+        {
+            AppendBotMessage("Statistics not available.", isWarning: true);
+            return;
+        }
+
+        string stats = DashboardManager.GenerateStatisticsPanel(profile);
+        AppendBotMessage(stats, isWelcome: true);
+        AppendBotMessage(DashboardManager.GetDailyTip());
+        AppendBotMessage(DashboardManager.GetDailyFact());
+    }
+
+    /// <summary>
+    /// Displays the settings menu.
+    /// </summary>
+    private void ShowSettings()
+    {
+        int userId = TaskDatabase.CurrentUserId;
+        var settings = TaskDatabase.GetOrCreateUserSettings(userId);
+
+        if (settings == null)
+        {
+            AppendBotMessage("Settings not available.", isWarning: true);
+            return;
+        }
+
+        AppendBotMessage(settings.DisplaySettings(), isWelcome: true);
+    }
+
+    /// <summary>
+    /// Displays the conversation suggestions.
+    /// </summary>
+    private void ShowConversationSuggestions()
+    {
+        AppendBotMessage(DashboardManager.GetConversationSuggestions());
+    }
+
+    /// <summary>
+    /// Displays the help page with available commands.
+    /// </summary>
+    private void ShowHelp()
+    {
+        string help = @"❓ Help — Available Commands
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Chat Commands:
+  • start quiz         → Begin a new cybersecurity quiz
+  • view tasks         → Display all your tasks
+  • show activity log  → Show recent activities
+  • show dashboard     → Display home dashboard
+  • show statistics    → View detailed statistics
+  • show settings      → Open settings menu
+  • help               → Show this help menu
+
+Topics to ask about:
+  • password safety    → Learn about strong passwords
+  • phishing           → Understanding phishing attacks
+  • 2fa                → Two-factor authentication
+  • privacy            → Online privacy tips
+  • malware            → Malware protection
+
+Task Management:
+  • add task [title]   → Create a new task
+  • complete task [id] → Mark task as done
+  • delete task [id]   → Remove a task
+
+Fun Commands:
+  • generate password  → Create a strong password
+  • check password     → Analyze password strength
+  • random tip         → Get a cyber security tip
+  • random fact        → Learn a cyber security fact
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+
+        AppendBotMessage(help, isWelcome: true);
+    }
+
+    /// <summary>
+    /// Handles conversation suggestion button clicks.
+    /// </summary>
+    private void SuggestionButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string tag)
+        {
+            string message = tag switch
+            {
+                "password" => "Tell me about password safety",
+                "phishing" => "Explain phishing attacks",
+                "privacy" => "Tell me about online privacy",
+                "statistics" => "Show statistics",
+                "help" => "Help",
+                _ => tag
+            };
+
+            UserInputBox.Text = message;
+            Send();
+        }
     }
 }

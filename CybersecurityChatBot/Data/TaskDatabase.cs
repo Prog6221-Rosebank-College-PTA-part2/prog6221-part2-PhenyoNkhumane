@@ -370,6 +370,153 @@ public static class TaskDatabase
         return Convert.ToInt32(result);
     }
 
+    public static UserProfile? GetUserProfile(int userId)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return null;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT id, name, favourite_topic, quiz_best_score, quiz_attempts, 
+                   quiz_average_score, total_tasks, completed_tasks, last_login, created_at
+            FROM users
+            WHERE id = @userId;";
+        cmd.Parameters.AddWithValue("@userId", userId);
+
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read())
+            return null;
+
+        return new UserProfile
+        {
+            UserId = reader.GetInt32("id"),
+            Name = reader.GetString("name"),
+            FavouriteTopic = reader.IsDBNull(reader.GetOrdinal("favourite_topic")) ? null : reader.GetString("favourite_topic"),
+            QuizBestScore = reader.GetInt32("quiz_best_score"),
+            QuizAttempts = reader.GetInt32("quiz_attempts"),
+            QuizAverageScore = reader.GetInt32("quiz_average_score"),
+            TotalTasks = reader.GetInt32("total_tasks"),
+            CompletedTasks = reader.GetInt32("completed_tasks"),
+            LastLogin = reader.GetDateTime("last_login"),
+            CreatedAt = reader.GetDateTime("created_at")
+        };
+    }
+
+    public static bool UpdateUserStatistics(int userId, string? favouriteTopic = null, int? quizScore = null, int? totalTasks = null, int? completedTasks = null)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+
+        var updates = new List<string>();
+
+        if (!string.IsNullOrEmpty(favouriteTopic))
+        {
+            updates.Add("favourite_topic = @favouriteTopic");
+            cmd.Parameters.AddWithValue("@favouriteTopic", favouriteTopic);
+        }
+
+        if (quizScore.HasValue)
+        {
+            updates.Add("quiz_best_score = GREATEST(quiz_best_score, @quizScore)");
+            updates.Add("quiz_attempts = quiz_attempts + 1");
+            cmd.Parameters.AddWithValue("@quizScore", quizScore.Value);
+        }
+
+        if (totalTasks.HasValue)
+        {
+            updates.Add("total_tasks = @totalTasks");
+            cmd.Parameters.AddWithValue("@totalTasks", totalTasks.Value);
+        }
+
+        if (completedTasks.HasValue)
+        {
+            updates.Add("completed_tasks = @completedTasks");
+            cmd.Parameters.AddWithValue("@completedTasks", completedTasks.Value);
+        }
+
+        updates.Add("last_login = CURRENT_TIMESTAMP");
+
+        cmd.CommandText = $@"
+            UPDATE users SET {string.Join(", ", updates)}
+            WHERE id = @userId;";
+        cmd.Parameters.AddWithValue("@userId", userId);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public static AppSettings? GetOrCreateUserSettings(int userId)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return null;
+
+        using var conn = OpenConnection();
+        
+        // Try to get existing settings
+        using var selectCmd = conn.CreateCommand();
+        selectCmd.CommandText = @"
+            SELECT user_id, dark_mode, enable_sounds, voice_greeting
+            FROM user_settings
+            WHERE user_id = @userId;";
+        selectCmd.Parameters.AddWithValue("@userId", userId);
+
+        using var reader = selectCmd.ExecuteReader();
+        if (reader.Read())
+        {
+            return new AppSettings
+            {
+                UserId = reader.GetInt32("user_id"),
+                DarkMode = reader.GetBoolean("dark_mode"),
+                EnableSounds = reader.GetBoolean("enable_sounds"),
+                VoiceGreeting = reader.GetBoolean("voice_greeting")
+            };
+        }
+
+        // Create default settings if they don't exist
+        using var insertCmd = conn.CreateCommand();
+        insertCmd.CommandText = @"
+            INSERT IGNORE INTO user_settings (user_id, dark_mode, enable_sounds, voice_greeting)
+            VALUES (@userId, 1, 1, 1);";
+        insertCmd.Parameters.AddWithValue("@userId", userId);
+        insertCmd.ExecuteNonQuery();
+
+        return new AppSettings
+        {
+            UserId = userId,
+            DarkMode = true,
+            EnableSounds = true,
+            VoiceGreeting = true
+        };
+    }
+
+    public static bool UpdateUserSettings(int userId, AppSettings settings)
+    {
+        EnsureReady();
+        if (!IsAvailable)
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            UPDATE user_settings
+            SET dark_mode = @darkMode,
+                enable_sounds = @enableSounds,
+                voice_greeting = @voiceGreeting
+            WHERE user_id = @userId;";
+        cmd.Parameters.AddWithValue("@userId", userId);
+        cmd.Parameters.AddWithValue("@darkMode", settings.DarkMode ? 1 : 0);
+        cmd.Parameters.AddWithValue("@enableSounds", settings.EnableSounds ? 1 : 0);
+        cmd.Parameters.AddWithValue("@voiceGreeting", settings.VoiceGreeting ? 1 : 0);
+
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
     private static void EnsureSchema()
     {
         using var conn = OpenConnection();
