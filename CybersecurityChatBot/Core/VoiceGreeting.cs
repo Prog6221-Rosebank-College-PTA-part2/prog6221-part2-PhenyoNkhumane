@@ -19,17 +19,31 @@ public static class VoiceGreeting
     /// </summary>
     public static void PlayVoiceGreeting()
     {
-        string path = Path.Combine(System.AppContext.BaseDirectory, "Greeting.wav");
-        try
+        string baseDir = System.AppContext.BaseDirectory;
+        string[] candidatePaths = new[]
         {
-            using (SoundPlayer player = new SoundPlayer(path))
+            Path.Combine(baseDir, "Greeting.wav"),
+            Path.Combine(baseDir, "CybersecurityChatBot", "Greeting.wav"),
+            Path.Combine(baseDir, "Assest", "Greeting.wav")
+        };
+
+        foreach (string path in candidatePaths)
+        {
+            if (!File.Exists(path))
+                continue;
+
+            try
             {
-                player.PlaySync();
+                using (SoundPlayer player = new SoundPlayer(path))
+                {
+                    player.PlaySync();
+                }
+                return;
             }
-        }
-        catch
-        {
-            // Silently continue — missing audio must never crash the UI
+            catch
+            {
+                // Try the next candidate if playback fails.
+            }
         }
     }
 }
