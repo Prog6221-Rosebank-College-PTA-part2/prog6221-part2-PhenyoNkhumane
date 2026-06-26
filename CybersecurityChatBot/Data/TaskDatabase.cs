@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using MySqlConnector;
 
 /// <summary>
@@ -13,8 +15,19 @@ public static class TaskDatabase
     private static bool _initialized;
     private static string? _lastError;
     private static int _currentUserId;
+    private static bool _usingFallbackStorage;
+    private static readonly object _fallbackLock = new();
+    private static readonly List<FallbackUser> _fallbackUsers = new();
+    private static readonly List<FallbackTask> _fallbackTasks = new();
+    private static readonly List<FallbackActivity> _fallbackActivities = new();
+    private static readonly Dictionary<int, FallbackSettings> _fallbackSettings = new();
+    private static int _fallbackNextUserId = 1;
+    private static int _fallbackNextTaskId = 1;
+    private static int _fallbackNextActivityId = 1;
+    private static readonly string _fallbackDataPath = Path.Combine(AppContext.BaseDirectory, "local_tasks.json");
 
     public static bool IsAvailable { get; private set; }
+    public static bool IsFallbackMode { get; private set; }
     public static string? LastError => _lastError;
     public static int CurrentUserId => _currentUserId;
 
@@ -30,12 +43,19 @@ public static class TaskDatabase
         {
             EnsureSchema();
             IsAvailable = true;
+            IsFallbackMode = false;
+            _usingFallbackStorage = false;
             _lastError = null;
         }
         catch (Exception ex)
         {
             IsAvailable = false;
-            _lastError = ex.Message;
+            IsFallbackMode = true;
+            _usingFallbackStorage = true;
+            _lastError = $"MySQL unavailable: {ex.Message}. Using local fallback storage.";
+            LoadFallbackData();
+            EnsureFallbackSeeded();
+            _currentUserId = _fallbackUsers.FirstOrDefault()?.Id ?? 1;
         }
     }
 
@@ -69,8 +89,30 @@ public static class TaskDatabase
     public static int AddTask(string title, string description, DateTime? reminderDate, DateTime? dueDate)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             throw new InvalidOperationException("Task database is not available.");
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                EnsureFallbackSeeded();
+                var task = new FallbackTask
+                {
+                    Id = _fallbackNextTaskId++,
+                    UserId = _currentUserId,
+                    Title = title.Trim(),
+                    Description = description.Trim(),
+                    ReminderDate = reminderDate,
+                    DueDate = dueDate,
+                    IsCompleted = false,
+                    CreatedAt = DateTime.Now
+                };
+                _fallbackTasks.Add(task);
+                SaveFallbackData();
+                return task.Id;
+            }
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -108,8 +150,34 @@ public static class TaskDatabase
     {
         EnsureReady();
         var tasks = new List<CyberTask>();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return tasks;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                EnsureFallbackSeeded();
+                tasks.AddRange(_fallbackTasks
+                    .Where(t => t.UserId == _currentUserId)
+                    .Where(t => string.IsNullOrWhiteSpace(search) || t.Title.Contains(search, StringComparison.OrdinalIgnoreCase) || t.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .Where(t => !completedFilter.HasValue || t.IsCompleted == completedFilter.Value)
+                    .Select(t => new CyberTask
+                    {
+                        Id = t.Id,
+                        Title = t.Title,
+                        Description = t.Description,
+                        ReminderDate = t.ReminderDate,
+                        DueDate = t.DueDate,
+                        IsCompleted = t.IsCompleted,
+                        CreatedAt = t.CreatedAt
+                    }));
+            }
+
+            return completedFilter.HasValue || !string.IsNullOrWhiteSpace(search) || !string.IsNullOrWhiteSpace(sortColumn)
+                ? tasks.OrderByDescending(t => t.CreatedAt).ToList()
+                : tasks;
+        }
 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
@@ -286,6 +354,26 @@ public static class TaskDatabase
     public static bool LogActivity(string description)
     {
         EnsureReady();
+        if (!IsAvailable && !_usingFallbackStorage)
+            return false;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                EnsureFallbackSeeded();
+                _fallbackActivities.Add(new FallbackActivity
+                {
+                    Id = _fallbackNextActivityId++,
+                    UserId = _currentUserId,
+                    Description = description.Trim(),
+                    Timestamp = DateTime.Now
+                });
+                SaveFallbackData();
+                return true;
+            }
+        }
+
         if (!IsAvailable || _currentUserId == 0)
             return false;
 
@@ -304,6 +392,24 @@ public static class TaskDatabase
     {
         EnsureReady();
         var entries = new List<ActivityEntry>();
+        if (!IsAvailable && !_usingFallbackStorage)
+            return entries;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                EnsureFallbackSeeded();
+                entries.AddRange(_fallbackActivities
+                    .Where(a => a.UserId == _currentUserId)
+                    .OrderByDescending(a => a.Timestamp)
+                    .Take(count)
+                    .Select(a => new ActivityEntry(a.Timestamp, a.Description)));
+            }
+
+            return entries;
+        }
+
         if (!IsAvailable || _currentUserId == 0)
             return entries;
 
@@ -335,7 +441,7 @@ public static class TaskDatabase
             userName = "Guest";
 
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return 0;
 
         int userId = AddOrGetUser(userName);
@@ -453,8 +559,39 @@ public static class TaskDatabase
     public static AppSettings? GetOrCreateUserSettings(int userId)
     {
         EnsureReady();
-        if (!IsAvailable)
+        if (!IsAvailable && !_usingFallbackStorage)
             return null;
+
+        if (_usingFallbackStorage)
+        {
+            lock (_fallbackLock)
+            {
+                var user = _fallbackUsers.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                    return null;
+
+                if (!_fallbackSettings.ContainsKey(userId))
+                {
+                    _fallbackSettings[userId] = new FallbackSettings
+                    {
+                        UserId = userId,
+                        DarkMode = true,
+                        EnableSounds = true,
+                        VoiceGreeting = true
+                    };
+                    SaveFallbackData();
+                }
+
+                var settings = _fallbackSettings[userId];
+                return new AppSettings
+                {
+                    UserId = settings.UserId,
+                    DarkMode = settings.DarkMode,
+                    EnableSounds = settings.EnableSounds,
+                    VoiceGreeting = settings.VoiceGreeting
+                };
+            }
+        }
 
         using var conn = OpenConnection();
         
@@ -515,6 +652,85 @@ public static class TaskDatabase
         cmd.Parameters.AddWithValue("@voiceGreeting", settings.VoiceGreeting ? 1 : 0);
 
         return cmd.ExecuteNonQuery() > 0;
+    }
+
+    private static void LoadFallbackData()
+    {
+        lock (_fallbackLock)
+        {
+            if (!File.Exists(_fallbackDataPath))
+                return;
+
+            try
+            {
+                string json = File.ReadAllText(_fallbackDataPath);
+                var store = JsonSerializer.Deserialize<FallbackStore>(json);
+                if (store == null)
+                    return;
+
+                _fallbackUsers.Clear();
+                _fallbackTasks.Clear();
+                _fallbackActivities.Clear();
+                _fallbackSettings.Clear();
+
+                if (store.Users != null)
+                    _fallbackUsers.AddRange(store.Users);
+                if (store.Tasks != null)
+                    _fallbackTasks.AddRange(store.Tasks);
+                if (store.Activities != null)
+                    _fallbackActivities.AddRange(store.Activities);
+                if (store.Settings != null)
+                    foreach (var item in store.Settings)
+                        _fallbackSettings[item.UserId] = item;
+
+                _fallbackNextUserId = _fallbackUsers.Count > 0 ? _fallbackUsers.Max(u => u.Id) + 1 : 1;
+                _fallbackNextTaskId = _fallbackTasks.Count > 0 ? _fallbackTasks.Max(t => t.Id) + 1 : 1;
+                _fallbackNextActivityId = _fallbackActivities.Count > 0 ? _fallbackActivities.Max(a => a.Id) + 1 : 1;
+            }
+            catch
+            {
+                _fallbackUsers.Clear();
+                _fallbackTasks.Clear();
+                _fallbackActivities.Clear();
+                _fallbackSettings.Clear();
+            }
+        }
+    }
+
+    private static void SaveFallbackData()
+    {
+        lock (_fallbackLock)
+        {
+            var store = new FallbackStore
+            {
+                Users = _fallbackUsers.ToList(),
+                Tasks = _fallbackTasks.ToList(),
+                Activities = _fallbackActivities.ToList(),
+                Settings = _fallbackSettings.Values.ToList()
+            };
+
+            string json = JsonSerializer.Serialize(store, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(_fallbackDataPath, json);
+        }
+    }
+
+    private static void EnsureFallbackSeeded()
+    {
+        lock (_fallbackLock)
+        {
+            if (_fallbackUsers.Count == 0)
+            {
+                _fallbackUsers.Add(new FallbackUser
+                {
+                    Id = _fallbackNextUserId++,
+                    Name = "Guest",
+                    CreatedAt = DateTime.Now,
+                    LastLogin = DateTime.Now
+                });
+                _currentUserId = 1;
+                SaveFallbackData();
+            }
+        }
     }
 
     private static void EnsureSchema()
@@ -609,6 +825,56 @@ public static class TaskDatabase
         var conn = new MySqlConnection(_connectionString);
         conn.Open();
         return conn;
+    }
+
+    private sealed class FallbackStore
+    {
+        public List<FallbackUser> Users { get; set; } = new();
+        public List<FallbackTask> Tasks { get; set; } = new();
+        public List<FallbackActivity> Activities { get; set; } = new();
+        public List<FallbackSettings> Settings { get; set; } = new();
+    }
+
+    private sealed class FallbackUser
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "Guest";
+        public string? FavouriteTopic { get; set; }
+        public int BestQuizScore { get; set; }
+        public int QuizAttempts { get; set; }
+        public int QuizAverageScore { get; set; }
+        public int TotalTasks { get; set; }
+        public int CompletedTasks { get; set; }
+        public DateTime LastLogin { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    private sealed class FallbackTask
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime? ReminderDate { get; set; }
+        public DateTime? DueDate { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    private sealed class FallbackActivity
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+    }
+
+    private sealed class FallbackSettings
+    {
+        public int UserId { get; set; }
+        public bool DarkMode { get; set; } = true;
+        public bool EnableSounds { get; set; } = true;
+        public bool VoiceGreeting { get; set; } = true;
     }
 
     private static string LoadConnectionString()

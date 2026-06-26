@@ -290,7 +290,9 @@ public partial class MainWindow : Window
             {
                 DbStatusTextBlock.Text = TaskDatabase.IsAvailable
                     ? "Database: connected ✓"
-                    : $"Database: offline — {TaskDatabase.LastError ?? "unknown error"}";
+                    : TaskDatabase.IsFallbackMode
+                        ? "Database: offline — using local fallback mode"
+                        : $"Database: offline — {TaskDatabase.LastError ?? "unknown error"}";
             }
         }
         catch (Exception ex)
