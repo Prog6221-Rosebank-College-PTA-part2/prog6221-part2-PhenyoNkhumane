@@ -50,6 +50,7 @@ public class ChatBot
             return "Name cannot be empty — please enter your name to continue.";
 
         MemoryStore.SetUserName(rawName.Trim());
+        TaskDatabase.AddOrGetUser(rawName.Trim());
         SessionStarted = true;
         return null; // null = success, no error
     }
@@ -118,6 +119,15 @@ public class ChatBot
 
     public IReadOnlyList<CyberTask> GetTasks() =>
         _conversation.GetPart3Features().GetTasks();
+
+    public string AddTask(string title, string description, DateTime? reminderDate, DateTime? dueDate) =>
+        _conversation.GetPart3Features().AddTask(title, description, reminderDate, dueDate);
+
+    public string CompleteTask(int id) =>
+        _conversation.GetPart3Features().CompleteTask(id);
+
+    public string DeleteTask(int id) =>
+        _conversation.GetPart3Features().DeleteTask(id);
 
     public bool QuizIsActive =>
         _conversation.GetPart3Features().QuizIsActive;

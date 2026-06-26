@@ -79,6 +79,13 @@ public class Part3FeatureManager
         }
     }
 
+    public string AddTask(string title, string description, DateTime? reminderDate, DateTime? dueDate) =>
+        _tasks.AddTaskFromUi(title, description, reminderDate, dueDate);
+
+    public string CompleteTask(int id) => _tasks.CompleteTaskById(id);
+
+    public string DeleteTask(int id) => _tasks.DeleteTaskById(id);
+
     public string GetDatabaseStatusMessage()
     {
         if (TaskDatabase.IsAvailable)

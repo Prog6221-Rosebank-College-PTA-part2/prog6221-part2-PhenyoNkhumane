@@ -383,12 +383,11 @@
                                  VerticalScrollBarVisibility="Auto"
                                  ToolTip="Task description"
                                  Margin="0,0,0,8"/>
-                        <TextBox x:Name="NewTaskReminderTextBox"
-                                 Style="{StaticResource InputBoxStyle}"
-                                 Height="38"
-                                 FontSize="12"
-                                 ToolTip="Optional reminder (e.g. tomorrow, in 3 days)"
-                                 Margin="0,0,0,8"/>
+                        <DatePicker x:Name="NewTaskReminderDatePicker"
+                                    Height="38"
+                                    FontSize="12"
+                                    ToolTip="Reminder date"
+                                    Margin="0,0,0,8"/>
                         <TextBox x:Name="NewTaskDueDateTextBox"
                                  Style="{StaticResource InputBoxStyle}"
                                  Height="38"
@@ -415,7 +414,7 @@
                     </StackPanel>
                 </Border>
 
-                    <ListView x:Name="TasksListView"
+                    <DataGrid x:Name="TasksDataGrid"
                               Background="#0d0d1a"
                               BorderBrush="#1e3a5f"
                               BorderThickness="1"
@@ -423,17 +422,29 @@
                               FontFamily="Consolas"
                               FontSize="11"
                               SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="True"
                               Margin="0,0,0,8">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="ID" Width="30" DisplayMemberBinding="{Binding Id}"/>
-                                <GridViewColumn Header="Task" Width="120" DisplayMemberBinding="{Binding Title}"/>
-                                <GridViewColumn Header="Status" Width="70" DisplayMemberBinding="{Binding StatusDisplay}"/>
-                                <GridViewColumn Header="Reminder" Width="100" DisplayMemberBinding="{Binding ReminderDisplay}"/>
-                                <GridViewColumn Header="Due" Width="100" DisplayMemberBinding="{Binding DueDisplay}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                        <Setter Property="Background" Value="#2e3d2f"/>
+                                        <Setter Property="Foreground" Value="#d7f5dc"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="30"/>
+                            <DataGridTextColumn Header="Task" Binding="{Binding Title}" Width="120"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding StatusDisplay}" Width="70"/>
+                            <DataGridTextColumn Header="Reminder" Binding="{Binding ReminderDisplay}" Width="100"/>
+                            <DataGridTextColumn Header="Due" Binding="{Binding DueDisplay}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                         <Button x:Name="CompleteTaskButton"

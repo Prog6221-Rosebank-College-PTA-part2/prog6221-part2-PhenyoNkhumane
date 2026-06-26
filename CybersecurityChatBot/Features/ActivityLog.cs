@@ -18,6 +18,15 @@ public static class ActivityLog
 
         if (_entries.Count > MaxEntries)
             _entries.RemoveAt(_entries.Count - 1);
+
+        try
+        {
+            TaskDatabase.LogActivity(description);
+        }
+        catch
+        {
+            // Keep activity logging resilient even when the database is unavailable.
+        }
     }
 
     public static string FormatRecent(int count = 8, bool showAll = false)

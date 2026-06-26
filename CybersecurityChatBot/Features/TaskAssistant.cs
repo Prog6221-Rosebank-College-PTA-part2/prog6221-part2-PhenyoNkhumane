@@ -63,9 +63,78 @@ public class TaskAssistant
         }
         catch (Exception ex)
         {
-            return $"Could not load tasks: {ex.Message}";
+            return BuildDatabaseErrorMessage(ex, "load tasks");
         }
     }
+
+    public string AddTaskFromUi(string title, string description, DateTime? reminderDate, DateTime? dueDate)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return "⚠ Please enter a task title.";
+
+        if (string.IsNullOrWhiteSpace(description))
+            return "⚠ Please enter a task description.";
+
+        try
+        {
+            int id = TaskDatabase.AddTask(title, description, reminderDate, dueDate);
+            ActivityLog.Log($"Task added: '{title}'.");
+
+            string reminderLine = reminderDate.HasValue
+                ? $"Reminder: {FormatFriendlyDate(reminderDate.Value)}"
+                : "Reminder: none";
+
+            return $"✓ Task added successfully!\n\nTitle: {title}\n{reminderLine}\n\nGood luck staying secure!";
+        }
+        catch (Exception ex)
+        {
+            return BuildDatabaseErrorMessage(ex, "save your task");
+        }
+    }
+
+    public string CompleteTaskById(int id)
+    {
+        try
+        {
+            CyberTask? task = TaskDatabase.GetTaskById(id);
+            if (task == null)
+                return $"No task found with ID {id}.";
+
+            bool success = TaskDatabase.MarkCompleted(id);
+            if (!success)
+                return $"I couldn't update task {id}.";
+
+            ActivityLog.Log($"Task completed: '{task.Title}'.");
+            return "✓ Task marked as completed.\n\nWell done!";
+        }
+        catch (Exception ex)
+        {
+            return BuildDatabaseErrorMessage(ex, "complete the task");
+        }
+    }
+
+    public string DeleteTaskById(int id)
+    {
+        try
+        {
+            CyberTask? task = TaskDatabase.GetTaskById(id);
+            if (task == null)
+                return $"No task found with ID {id}.";
+
+            bool success = TaskDatabase.DeleteTask(id);
+            if (!success)
+                return $"I couldn't delete task {id}.";
+
+            ActivityLog.Log($"Task deleted: '{task.Title}'.");
+            return "🗑 Task deleted successfully.";
+        }
+        catch (Exception ex)
+        {
+            return BuildDatabaseErrorMessage(ex, "delete the task");
+        }
+    }
+
+    public IReadOnlyList<CyberTask> GetTasks() => TaskDatabase.GetAllTasks();
 
     private string HandleAddTask(NlpIntentDetector.IntentResult intent)
     {
@@ -88,7 +157,7 @@ public class TaskAssistant
         }
         catch (Exception ex)
         {
-            return $"Could not save task: {ex.Message}";
+            return BuildDatabaseErrorMessage(ex, "save the task");
         }
     }
 
@@ -166,7 +235,7 @@ public class TaskAssistant
         }
         catch (Exception ex)
         {
-            return $"Could not set reminder: {ex.Message}";
+            return BuildDatabaseErrorMessage(ex, "set the reminder");
         }
     }
 
@@ -194,7 +263,7 @@ public class TaskAssistant
         }
         catch (Exception ex)
         {
-            return $"Could not delete task: {ex.Message}";
+            return BuildDatabaseErrorMessage(ex, "delete the task");
         }
     }
 
@@ -216,7 +285,7 @@ public class TaskAssistant
         }
         catch (Exception ex)
         {
-            return $"Could not update task: {ex.Message}";
+            return BuildDatabaseErrorMessage(ex, "complete the task");
         }
     }
 
@@ -298,6 +367,22 @@ public class TaskAssistant
             : date.Date == DateTime.Today.AddDays(1)
                 ? "tomorrow"
                 : date.ToString("dd MMM yyyy 'at' HH:mm");
+
+    private static string BuildDatabaseErrorMessage(Exception ex, string action)
+    {
+        System.Diagnostics.Debug.WriteLine($"Task action failed during {action}: {ex}");
+
+        string message = ex.Message ?? string.Empty;
+        bool isConnectionIssue = message.IndexOf("Unable to connect", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            message.IndexOf("MySQL", StringComparison.OrdinalIgnoreCase) >= 0 && message.IndexOf("host", StringComparison.OrdinalIgnoreCase) >= 0;
+
+        if (isConnectionIssue)
+        {
+            return "⚠ Task Manager is currently offline.\n\nI can't save tasks right now because the database connection isn't available.\n\nPlease check the database connection and try again.";
+        }
+
+        return $"⚠ I couldn't {action} right now.";
+    }
 
     private void ClearPending()
     {

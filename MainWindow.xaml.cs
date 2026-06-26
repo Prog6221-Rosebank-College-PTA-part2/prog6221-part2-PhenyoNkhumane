@@ -186,8 +186,8 @@ public partial class MainWindow : Window
 
     private void RefreshSidebar()
     {
-        TasksListView.ItemsSource = null;
-        TasksListView.ItemsSource = _chatBot.GetTasks();
+        TasksDataGrid.ItemsSource = null;
+        TasksDataGrid.ItemsSource = _chatBot.GetTasks();
         QuizStatusTextBlock.Text = _chatBot.GetQuizStatusText();
 
         DbStatusTextBlock.Text = TaskDatabase.IsAvailable
@@ -199,68 +199,72 @@ public partial class MainWindow : Window
     {
         string title       = NewTaskTitleTextBox.Text.Trim();
         string description = NewTaskDescriptionTextBox.Text.Trim();
-        string reminder    = NewTaskReminderTextBox.Text.Trim();
+        DateTime? reminderDate = NewTaskReminderDatePicker.SelectedDate?.Date;
 
         if (string.IsNullOrWhiteSpace(title))
         {
-            AppendBotMessage("Please enter a task title before adding a task.", isWarning: true);
+            AppendBotMessage("⚠ Please enter a task title.", isWarning: true);
             return;
         }
 
-        string command = "Add task";
-        if (!string.IsNullOrWhiteSpace(description))
-            command += $" - {title}: {description}";
-        else
-            command += $" - {title}";
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            AppendBotMessage("⚠ Please enter a task description.", isWarning: true);
+            return;
+        }
 
-        if (!string.IsNullOrWhiteSpace(reminder))
-            command += $" remind me {reminder}";
+        if (!reminderDate.HasValue)
+        {
+            AppendBotMessage("⚠ Please choose a reminder date.", isWarning: true);
+            return;
+        }
 
-        AppendUserMessage(command);
-        var response = _chatBot.ProcessMessage(command);
-        AppendBotMessage(response.Message, isWarning: response.IsWarning);
+        AppendUserMessage($"Add task - {title}: {description}");
+        string response = _chatBot.AddTask(title, description, reminderDate, null);
+        AppendBotMessage(response, isWarning: response.StartsWith("⚠", StringComparison.Ordinal));
 
         NewTaskTitleTextBox.Clear();
         NewTaskDescriptionTextBox.Clear();
-        NewTaskReminderTextBox.Clear();
+        NewTaskReminderDatePicker.SelectedDate = null;
         RefreshSidebar();
     }
 
     private void CompleteTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        if (TasksListView.SelectedItem is CyberTask task)
+        if (TasksDataGrid.SelectedItem is CyberTask task)
         {
-            string command = $"complete task {task.Id}";
-            AppendUserMessage(command);
-            var response = _chatBot.ProcessMessage(command);
-            AppendBotMessage(response.Message, isWarning: response.IsWarning);
+            AppendUserMessage($"Complete task {task.Id}");
+            string response = _chatBot.CompleteTask(task.Id);
+            AppendBotMessage(response, isWarning: response.StartsWith("⚠", StringComparison.Ordinal));
             RefreshSidebar();
         }
         else
         {
-            AppendBotMessage("Select a task from the list first, then click Complete.", isWarning: true);
+            AppendBotMessage("Please select a task first.", isWarning: true);
         }
     }
 
     private void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        if (TasksListView.SelectedItem is CyberTask task)
+        if (TasksDataGrid.SelectedItem is not CyberTask task)
         {
-            string command = $"delete task {task.Id}";
-            AppendUserMessage(command);
-            var response = _chatBot.ProcessMessage(command);
-            AppendBotMessage(response.Message, isWarning: response.IsWarning);
-            RefreshSidebar();
+            AppendBotMessage("Please select a task first.", isWarning: true);
+            return;
         }
-        else
-        {
-            AppendBotMessage("Select a task from the list first, then click Delete.", isWarning: true);
-        }
+
+        var result = MessageBox.Show($"Are you sure you want to delete '{task.Title}'?", "Delete task", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result != MessageBoxResult.Yes)
+            return;
+
+        AppendUserMessage($"Delete task {task.Id}");
+        string response = _chatBot.DeleteTask(task.Id);
+        AppendBotMessage(response, isWarning: response.StartsWith("⚠", StringComparison.Ordinal));
+        RefreshSidebar();
     }
 
     private void EditTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        if (TasksListView.SelectedItem is CyberTask task)
+        if (TasksDataGrid.SelectedItem is CyberTask task)
         {
             // Trigger edit flow via chat bot; UI could be enhanced to open an editor.
             string command = $"edit task {task.Id}";
