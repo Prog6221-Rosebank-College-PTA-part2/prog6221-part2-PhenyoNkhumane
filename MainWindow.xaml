@@ -292,22 +292,86 @@
                            TextWrapping="Wrap"
                            Margin="0,0,0,10"/>
 
-                <ListView Grid.Row="2"
-                          x:Name="TasksListView"
-                          Background="#0d0d1a"
-                          BorderBrush="#1e3a5f"
-                          BorderThickness="1"
-                          Foreground="#e0e0e0"
-                          FontFamily="Consolas"
-                          FontSize="11">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="ID" Width="30" DisplayMemberBinding="{Binding Id}"/>
-                            <GridViewColumn Header="Task" Width="140" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Status" Width="70" DisplayMemberBinding="{Binding StatusDisplay}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <StackPanel Grid.Row="2" Orientation="Vertical">
+                    <Border Background="#14142f"
+                            BorderBrush="#1e3a5f"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="10"
+                            Margin="0,0,0,8">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Add cybersecurity task"
+                                       FontFamily="Consolas"
+                                       FontSize="12"
+                                       Foreground="#e0e0e0"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,8"/>
+                            <TextBox x:Name="NewTaskTitleTextBox"
+                                     Style="{StaticResource InputBoxStyle}"
+                                     Height="38"
+                                     FontSize="12"
+                                     ToolTip="Task title (e.g. Update password)"
+                                     Margin="0,0,0,8"/>
+                            <TextBox x:Name="NewTaskDescriptionTextBox"
+                                     Style="{StaticResource InputBoxStyle}"
+                                     Height="60"
+                                     FontSize="12"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     ToolTip="Task description"
+                                     Margin="0,0,0,8"/>
+                            <TextBox x:Name="NewTaskReminderTextBox"
+                                     Style="{StaticResource InputBoxStyle}"
+                                     Height="38"
+                                     FontSize="12"
+                                     ToolTip="Optional reminder (e.g. tomorrow, in 3 days)"
+                                     Margin="0,0,0,8"/>
+                            <Button x:Name="AddTaskButton"
+                                    Content="+ Add Task"
+                                    Style="{StaticResource SendButtonStyle}"
+                                    Height="36"
+                                    Click="AddTaskButton_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <ListView x:Name="TasksListView"
+                              Background="#0d0d1a"
+                              BorderBrush="#1e3a5f"
+                              BorderThickness="1"
+                              Foreground="#e0e0e0"
+                              FontFamily="Consolas"
+                              FontSize="11"
+                              SelectionMode="Single"
+                              Margin="0,0,0,8">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="ID" Width="30" DisplayMemberBinding="{Binding Id}"/>
+                                <GridViewColumn Header="Task" Width="120" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Status" Width="70" DisplayMemberBinding="{Binding StatusDisplay}"/>
+                                <GridViewColumn Header="Reminder" Width="100" DisplayMemberBinding="{Binding ReminderDisplay}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button x:Name="CompleteTaskButton"
+                                Content="✔ Complete"
+                                Style="{StaticResource SendButtonStyle}"
+                                Height="36"
+                                Width="120"
+                                Margin="0,0,8,0"
+                                Click="CompleteTaskButton_Click"/>
+                        <Button x:Name="DeleteTaskButton"
+                                Content="🗑 Delete"
+                                Style="{StaticResource SendButtonStyle}"
+                                Height="36"
+                                Width="120"
+                                Background="#ff5252"
+                                Foreground="#ffffff"
+                                Click="DeleteTaskButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
 
                 <TextBlock Grid.Row="3"
                            x:Name="QuizStatusTextBlock"

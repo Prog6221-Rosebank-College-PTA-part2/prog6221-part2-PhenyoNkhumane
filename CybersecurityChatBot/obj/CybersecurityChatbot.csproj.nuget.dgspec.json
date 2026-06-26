@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatbot\\CybersecurityChatbot.csproj": {}
+    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatBot\\CybersecurityChatbot.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatbot\\CybersecurityChatbot.csproj": {
+    "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatBot\\CybersecurityChatbot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatbot\\CybersecurityChatbot.csproj",
+        "projectUniqueName": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatBot\\CybersecurityChatbot.csproj",
         "projectName": "CybersecurityChatbot",
-        "projectPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatbot\\CybersecurityChatbot.csproj",
+        "projectPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatBot\\CybersecurityChatbot.csproj",
         "packagesPath": "C:\\Users\\pheny\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatbot\\obj\\",
+        "outputPath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatBot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

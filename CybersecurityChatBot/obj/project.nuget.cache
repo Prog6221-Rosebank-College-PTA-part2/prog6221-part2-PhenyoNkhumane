@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "2BS2eRTUIa8=",
+  "dgSpecHash": "OPF+QbuIHso=",
   "success": true,
-  "projectFilePath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatbot\\CybersecurityChatbot.csproj",
+  "projectFilePath": "C:\\Users\\pheny\\Videos\\prog6221-part2-PhenyoNkhumane\\CybersecurityChatBot\\CybersecurityChatbot.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\pheny\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
     "C:\\Users\\pheny\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",

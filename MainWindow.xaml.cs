@@ -136,6 +136,69 @@ public partial class MainWindow : Window
             : $"Database: offline — {TaskDatabase.LastError}";
     }
 
+    private void AddTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        string title       = NewTaskTitleTextBox.Text.Trim();
+        string description = NewTaskDescriptionTextBox.Text.Trim();
+        string reminder    = NewTaskReminderTextBox.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            AppendBotMessage("Please enter a task title before adding a task.", isWarning: true);
+            return;
+        }
+
+        string command = "Add task";
+        if (!string.IsNullOrWhiteSpace(description))
+            command += $" - {title}: {description}";
+        else
+            command += $" - {title}";
+
+        if (!string.IsNullOrWhiteSpace(reminder))
+            command += $" remind me {reminder}";
+
+        AppendUserMessage(command);
+        var response = _chatBot.ProcessMessage(command);
+        AppendBotMessage(response.Message, isWarning: response.IsWarning);
+
+        NewTaskTitleTextBox.Clear();
+        NewTaskDescriptionTextBox.Clear();
+        NewTaskReminderTextBox.Clear();
+        RefreshSidebar();
+    }
+
+    private void CompleteTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TasksListView.SelectedItem is CyberTask task)
+        {
+            string command = $"complete task {task.Id}";
+            AppendUserMessage(command);
+            var response = _chatBot.ProcessMessage(command);
+            AppendBotMessage(response.Message, isWarning: response.IsWarning);
+            RefreshSidebar();
+        }
+        else
+        {
+            AppendBotMessage("Select a task from the list first, then click Complete.", isWarning: true);
+        }
+    }
+
+    private void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TasksListView.SelectedItem is CyberTask task)
+        {
+            string command = $"delete task {task.Id}";
+            AppendUserMessage(command);
+            var response = _chatBot.ProcessMessage(command);
+            AppendBotMessage(response.Message, isWarning: response.IsWarning);
+            RefreshSidebar();
+        }
+        else
+        {
+            AppendBotMessage("Select a task from the list first, then click Delete.", isWarning: true);
+        }
+    }
+
     private void AppendUserMessage(string text)
     {
         string label = $"{_chatBot.GetUserName()} >";
