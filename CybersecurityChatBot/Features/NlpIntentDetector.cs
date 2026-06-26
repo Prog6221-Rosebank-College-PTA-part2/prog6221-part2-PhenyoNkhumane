@@ -25,10 +25,10 @@ public static class NlpIntentDetector
 
     public sealed class IntentResult
     {
-        public Intent Intent { get; init; }
-        public string? TaskTitle { get; init; }
-        public string? ReminderPhrase { get; init; }
-        public int? TaskId { get; init; }
+        public Intent Intent { get; set; }
+        public string? TaskTitle { get; set; }
+        public string? ReminderPhrase { get; set; }
+        public int? TaskId { get; set; }
     }
 
     private static readonly string[] AddTaskPhrases =
