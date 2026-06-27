@@ -17,6 +17,7 @@ public static class NlpIntentDetector
         CompleteTask,
         SetReminder,
         StartQuiz,
+        ResumeQuiz,
         ShowActivityLog,
         ShowMoreActivityLog,
         ShowDashboard,
@@ -86,7 +87,12 @@ public static class NlpIntentDetector
     {
         "start quiz", "play quiz", "begin quiz", "quiz me", "cyber quiz",
         "start the quiz", "play the quiz", "mini game", "start game", "take quiz",
-        "show quiz", "resume quiz", "continue quiz", "take the quiz"
+        "take the quiz"
+    };
+
+    private static readonly string[] ResumeQuizPhrases =
+    {
+        "resume quiz", "continue quiz", "show quiz", "return to quiz"
     };
 
     private static readonly string[] ActivityLogPhrases =
@@ -199,6 +205,12 @@ public static class NlpIntentDetector
         if (ContainsAny(input, ActivityLogPhrases))
         {
             result.Intent = Intent.ShowActivityLog;
+            return result;
+        }
+
+        if (ContainsAny(input, ResumeQuizPhrases))
+        {
+            result.Intent = Intent.ResumeQuiz;
             return result;
         }
 

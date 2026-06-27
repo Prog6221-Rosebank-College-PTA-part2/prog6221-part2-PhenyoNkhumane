@@ -10,6 +10,7 @@ public class Part3FeatureManager
     private readonly QuizGame _quiz = new QuizGame();
 
     public bool QuizIsActive => _quiz.IsActive;
+    public bool QuizPaused => _quiz.IsPaused;
     public int QuizScore => _quiz.CurrentScore;
     public int QuizQuestionNumber => _quiz.CurrentQuestionNumber;
     public int QuizTotalQuestions => _quiz.TotalQuestions;
@@ -65,6 +66,15 @@ public class Part3FeatureManager
             case NlpIntentDetector.Intent.ShowProfile:
                 ActivityLog.Log("User requested profile summary.");
                 return MemoryStore.GetProfileSummary(null);
+
+            case NlpIntentDetector.Intent.ResumeQuiz:
+                if (_quiz.IsPaused)
+                    return _quiz.Resume();
+                return _quiz.IsActive
+                    ? "A quiz is already in progress. Answer the current question or say 'quit quiz' to stop."
+                    : _quiz.QuizFinished
+                        ? "The last quiz has finished. Say 'start quiz' to play again."
+                        : "No paused quiz found. Say 'start quiz' to begin.";
 
             case NlpIntentDetector.Intent.ShowActivityLog:
                 return ActivityLog.FormatRecent();

@@ -27,13 +27,13 @@
     {
       "Id": 3,
       "Name": "Vicky",
-      "FavouriteTopic": "2fa",
+      "FavouriteTopic": "malware",
       "BestQuizScore": 0,
       "QuizAttempts": 0,
       "QuizAverageScore": 0,
       "TotalTasks": 4,
       "CompletedTasks": 1,
-      "LastLogin": "2026-06-27T02:23:35.058922+02:00",
+      "LastLogin": "2026-06-27T02:53:32.1340889+02:00",
       "CreatedAt": "2026-06-26T23:48:40.4831781+02:00"
     },
     {
@@ -109,6 +109,16 @@
       "DueDate": null,
       "IsCompleted": false,
       "CreatedAt": "2026-06-27T02:12:48.4202102+02:00"
+    },
+    {
+      "Id": 8,
+      "UserId": 3,
+      "Title": "add a 2fa",
+      "Description": "Enable two-factor authentication to add an extra layer of account security.",
+      "ReminderDate": "2026-06-28T09:00:00+02:00",
+      "DueDate": null,
+      "IsCompleted": false,
+      "CreatedAt": "2026-06-27T02:54:14.1677802+02:00"
     }
   ],
   "Activities": [
@@ -681,6 +691,270 @@
       "UserId": 3,
       "Description": "Processed feature command: c",
       "Timestamp": "2026-06-27T02:46:37.5071283+02:00"
+    },
+    {
+      "Id": 96,
+      "UserId": 3,
+      "Description": "Responded on topic: phishing.",
+      "Timestamp": "2026-06-27T02:52:55.5351086+02:00"
+    },
+    {
+      "Id": 97,
+      "UserId": 3,
+      "Description": "Responded on topic: 2fa.",
+      "Timestamp": "2026-06-27T02:53:24.2051202+02:00"
+    },
+    {
+      "Id": 98,
+      "UserId": 3,
+      "Description": "Responded on topic: malware.",
+      "Timestamp": "2026-06-27T02:53:32.1244827+02:00"
+    },
+    {
+      "Id": 99,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: SetReminder.",
+      "Timestamp": "2026-06-27T02:54:14.1560102+02:00"
+    },
+    {
+      "Id": 100,
+      "UserId": 3,
+      "Description": "Reminder set for \u0027add a 2fa\u0027 on 28 Jun 2026.",
+      "Timestamp": "2026-06-27T02:54:14.1693306+02:00"
+    },
+    {
+      "Id": 101,
+      "UserId": 3,
+      "Description": "Processed feature command: remind me to add a 2fa tomorrow",
+      "Timestamp": "2026-06-27T02:54:14.1714808+02:00"
+    },
+    {
+      "Id": 102,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: StartQuiz.",
+      "Timestamp": "2026-06-27T02:54:24.9061512+02:00"
+    },
+    {
+      "Id": 103,
+      "UserId": 3,
+      "Description": "Quiz Started",
+      "Timestamp": "2026-06-27T02:54:24.9096499+02:00"
+    },
+    {
+      "Id": 104,
+      "UserId": 3,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-27T02:54:24.9162029+02:00"
+    },
+    {
+      "Id": 105,
+      "UserId": 3,
+      "Description": "Processed feature command: end quiz",
+      "Timestamp": "2026-06-27T02:54:35.5829989+02:00"
+    },
+    {
+      "Id": 106,
+      "UserId": 3,
+      "Description": "Processed feature command: Show activity log",
+      "Timestamp": "2026-06-27T02:54:45.7113255+02:00"
+    },
+    {
+      "Id": 107,
+      "UserId": 3,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-27T02:55:00.3023799+02:00"
+    },
+    {
+      "Id": 108,
+      "UserId": 3,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-27T02:55:02.6304834+02:00"
+    },
+    {
+      "Id": 109,
+      "UserId": 3,
+      "Description": "Processed feature command: Start quiz",
+      "Timestamp": "2026-06-27T02:55:06.8314205+02:00"
+    },
+    {
+      "Id": 110,
+      "UserId": 3,
+      "Description": "Question 1 Incorrect",
+      "Timestamp": "2026-06-27T02:55:18.1982067+02:00"
+    },
+    {
+      "Id": 111,
+      "UserId": 3,
+      "Description": "Processed feature command: true",
+      "Timestamp": "2026-06-27T02:55:18.2052356+02:00"
+    },
+    {
+      "Id": 112,
+      "UserId": 3,
+      "Description": "Question 2 Correct",
+      "Timestamp": "2026-06-27T02:55:27.2558589+02:00"
+    },
+    {
+      "Id": 113,
+      "UserId": 3,
+      "Description": "Processed feature command: c",
+      "Timestamp": "2026-06-27T02:55:27.2578262+02:00"
+    },
+    {
+      "Id": 114,
+      "UserId": 3,
+      "Description": "Question 3 Correct",
+      "Timestamp": "2026-06-27T02:55:35.9462492+02:00"
+    },
+    {
+      "Id": 115,
+      "UserId": 3,
+      "Description": "Processed feature command: d",
+      "Timestamp": "2026-06-27T02:55:35.9603684+02:00"
+    },
+    {
+      "Id": 116,
+      "UserId": 3,
+      "Description": "Question 4 Incorrect",
+      "Timestamp": "2026-06-27T02:55:56.8303831+02:00"
+    },
+    {
+      "Id": 117,
+      "UserId": 3,
+      "Description": "Processed feature command: b",
+      "Timestamp": "2026-06-27T02:55:56.8321078+02:00"
+    },
+    {
+      "Id": 118,
+      "UserId": 3,
+      "Description": "Question 5 Incorrect",
+      "Timestamp": "2026-06-27T02:56:19.8626379+02:00"
+    },
+    {
+      "Id": 119,
+      "UserId": 3,
+      "Description": "Processed feature command: B",
+      "Timestamp": "2026-06-27T02:56:19.8766227+02:00"
+    },
+    {
+      "Id": 120,
+      "UserId": 3,
+      "Description": "Question 6 Incorrect",
+      "Timestamp": "2026-06-27T02:56:51.3460639+02:00"
+    },
+    {
+      "Id": 121,
+      "UserId": 3,
+      "Description": "Processed feature command: a",
+      "Timestamp": "2026-06-27T02:56:51.3476887+02:00"
+    },
+    {
+      "Id": 122,
+      "UserId": 3,
+      "Description": "Question 7 Correct",
+      "Timestamp": "2026-06-27T02:57:07.9101227+02:00"
+    },
+    {
+      "Id": 123,
+      "UserId": 3,
+      "Description": "Processed feature command: false",
+      "Timestamp": "2026-06-27T02:57:07.91885+02:00"
+    },
+    {
+      "Id": 124,
+      "UserId": 3,
+      "Description": "Question 8 Correct",
+      "Timestamp": "2026-06-27T02:57:21.6384329+02:00"
+    },
+    {
+      "Id": 125,
+      "UserId": 3,
+      "Description": "Processed feature command: b",
+      "Timestamp": "2026-06-27T02:57:21.6494093+02:00"
+    },
+    {
+      "Id": 126,
+      "UserId": 3,
+      "Description": "Question 9 Incorrect",
+      "Timestamp": "2026-06-27T02:57:48.2959726+02:00"
+    },
+    {
+      "Id": 127,
+      "UserId": 3,
+      "Description": "Processed feature command: d",
+      "Timestamp": "2026-06-27T02:57:48.2980161+02:00"
+    },
+    {
+      "Id": 128,
+      "UserId": 3,
+      "Description": "Question 10 Correct",
+      "Timestamp": "2026-06-27T02:58:01.7110563+02:00"
+    },
+    {
+      "Id": 129,
+      "UserId": 3,
+      "Description": "Processed feature command: d",
+      "Timestamp": "2026-06-27T02:58:01.7198869+02:00"
+    },
+    {
+      "Id": 130,
+      "UserId": 3,
+      "Description": "Question 11 Incorrect",
+      "Timestamp": "2026-06-27T02:58:14.6177138+02:00"
+    },
+    {
+      "Id": 131,
+      "UserId": 3,
+      "Description": "Processed feature command: true",
+      "Timestamp": "2026-06-27T02:58:14.6208118+02:00"
+    },
+    {
+      "Id": 132,
+      "UserId": 3,
+      "Description": "Question 12 Correct",
+      "Timestamp": "2026-06-27T02:58:33.0044697+02:00"
+    },
+    {
+      "Id": 133,
+      "UserId": 3,
+      "Description": "New best quiz score: 6",
+      "Timestamp": "2026-06-27T02:58:33.019759+02:00"
+    },
+    {
+      "Id": 134,
+      "UserId": 3,
+      "Description": "Quiz Completed \u2014 Score 6/12",
+      "Timestamp": "2026-06-27T02:58:33.0215209+02:00"
+    },
+    {
+      "Id": 135,
+      "UserId": 3,
+      "Description": "Processed feature command: true",
+      "Timestamp": "2026-06-27T02:58:33.0233743+02:00"
+    },
+    {
+      "Id": 136,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: ShowActivityLog.",
+      "Timestamp": "2026-06-27T02:59:33.9649201+02:00"
+    },
+    {
+      "Id": 137,
+      "UserId": 3,
+      "Description": "Processed feature command: Show activity log",
+      "Timestamp": "2026-06-27T02:59:33.9805547+02:00"
+    },
+    {
+      "Id": 138,
+      "UserId": 3,
+      "Description": "Recognised NLP intent: ShowMoreActivityLog.",
+      "Timestamp": "2026-06-27T03:00:21.9364781+02:00"
+    },
+    {
+      "Id": 139,
+      "UserId": 3,
+      "Description": "Processed feature command: show more activity log",
+      "Timestamp": "2026-06-27T03:00:21.9463929+02:00"
     }
   ],
   "Settings": []

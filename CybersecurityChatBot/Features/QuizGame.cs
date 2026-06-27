@@ -17,6 +17,7 @@ public class QuizGame
     private int _wrongAnswers;
     private bool _quizStarted;
     private bool _quizFinished;
+    private bool _paused;
     private readonly Random _rng = new Random();
     private List<ActiveQuestion> _activeQuestions = new List<ActiveQuestion>();
     private bool _awaitingQuitConfirmation;
@@ -24,6 +25,7 @@ public class QuizGame
     private string _bestScorePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "database", "best_score.txt");
 
     public bool IsActive => _active;
+    public bool IsPaused => _paused;
     public int CurrentQuestionNumber => _active ? _currentIndex + 1 : 0;
     public int TotalQuestions => _questions.Count;
     public int CurrentScore => _score;
@@ -49,6 +51,7 @@ public class QuizGame
         _quizFinished = false;
         _quizStarted = true;
         _active = true;
+        _paused = false;
 
         ActivityLog.Log("Quiz Started");
         // Randomize questions and shuffle choices
@@ -84,10 +87,11 @@ public class QuizGame
             if (up == "Y" || up == "YES")
             {
                 _active = false;
-                _quizFinished = true;
-                ActivityLog.Log("Quiz quit by user.");
-                _quizStarted = false;
-                return FormatFinalResults() + "\n\nYou're now back in normal chat mode. You can ask cybersecurity questions, manage tasks, or start another quiz whenever you like.";
+                _paused = true;
+                _quizFinished = false;
+                _awaitingQuitConfirmation = false;
+                ActivityLog.Log("Quiz paused by user.");
+                return "Quiz paused. Say 'resume quiz' when you're ready to continue.";
             }
             else
             {
@@ -161,7 +165,7 @@ public class QuizGame
 
     public string FormatCurrentQuestion()
     {
-        if (!_active || _currentIndex >= _activeQuestions.Count)
+        if ((!_active && !_paused) || _currentIndex >= _activeQuestions.Count)
             return string.Empty;
 
         ActiveQuestion aq = _activeQuestions[_currentIndex];
@@ -188,6 +192,17 @@ public class QuizGame
 
         sb.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         return sb.ToString().TrimEnd();
+    }
+
+    public string Resume()
+    {
+        if (!_paused)
+            return "There is no paused quiz to resume.";
+
+        _active = true;
+        _paused = false;
+        ActivityLog.Log("Quiz resumed by user.");
+        return FormatCurrentQuestion();
     }
 
     private string GetFinalSummary()
